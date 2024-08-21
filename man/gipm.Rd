@@ -84,7 +84,7 @@ subject to the elementwise constraint \eqn{x \ge 0}{x >= 0}.
 
 This implementation allows the user to specify methods to perform matrix by
 vector multiplication, computation of the gradient (which should be
-\deqn{G x + d}{Gx + d}), and computation of the step direction.
+\eqn{G x + d}{Gx + d}), and computation of the step direction.
 By default we compute the optimal step in the given step direction.
 }
 \note{
@@ -119,6 +119,9 @@ objective(G, d, y4$x)
 
 }
 \references{
+Pav, S. E. "An Iterative Algorithm for Regularized Non-negative Matrix Factorizations."
+Forthcoming. (2024)
+
 Merritt, Michael, and Zhang, Yin. "Interior-point Gradient Method for Large-Scale Totally 
 Nonnegative Least Squares Problems." Journal of Optimization Theory and Applications 126, 
 no 1 (2005): 191--202. \url{https://scholarship.rice.edu/bitstream/handle/1911/102020/TR04-08.pdf}

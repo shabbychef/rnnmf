@@ -44,3 +44,5 @@ submodule_directions.sh
 ^data-raw$
 rpkg_make
 rpkg_make
+.Rhistory
+.RData

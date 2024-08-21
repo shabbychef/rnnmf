@@ -31,8 +31,10 @@
 #' GNU Lesser General Public License for more details.
 #'
 #' @template etc
+#' @template poc
 #'
 #' @template ref-leeseung
+#' @template ref-pav
 #' @references
 #'
 #' Pav, Steven E. "System and method for unmixing spectroscopic observations with nonnegative 

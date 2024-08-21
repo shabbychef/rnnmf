@@ -39,3 +39,5 @@ cache/
 .Rd2pdf*/
 Rd2.pdf
 submodule_directions.sh
+.Rhistory
+.RData

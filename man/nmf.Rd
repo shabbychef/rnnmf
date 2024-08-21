@@ -25,13 +25,13 @@ nmf(
 }
 \arguments{
 \item{Y}{an \eqn{r \times c} matrix to be decomposed.
-Should have non-negative elements, though we do not check.}
+Should have non-negative elements; an error is thrown otherwise.}
 
 \item{L}{an \eqn{r \times d} matrix of the initial estimate of L.
-Should have non-negative elements, though we do not check.}
+Should have non-negative elements; an error is thrown otherwise.}
 
 \item{R}{an \eqn{d \times c} matrix of the initial estimate of R.
-Should have non-negative elements, though we do not check.}
+Should have non-negative elements; an error is thrown otherwise.}
 
 \item{W_0R}{the row space weighting matrix.
 This should be a positive definite non-negative symmetric \eqn{r \times r} matrix.
@@ -86,30 +86,67 @@ a list with the elements
 }
 }
 \description{
-One sentence or so that tells you some more.
+Non-negative matrix factorization with regularization.
 }
 \details{
-Really detailed. \eqn{\zeta}{zeta}.
+Attempts to factor given non-negative matrix \eqn{Y} as the product \eqn{LR}
+of two non-negative matrices. The objective function is Frobenius norm
+with \eqn{\ell_1} and \eqn{\ell_2} regularization terms.
+We seek to minimize the objective
+\deqn{\frac{1}{2}tr((Y-LR)' W_{0R} (Y-LR) W_{0C}) + \lambda_{1L} |L| + \lambda_{1R} |R| + \frac{\lambda_{2L}}{2} tr(L'L) + \frac{\lambda_{2R}}{2} tr(R'R),}
+subject to \eqn{L \ge 0} and \eqn{R \ge 0} elementwise, 
+where \eqn{|A|} is the sum of the elements of \eqn{A} and 
+\eqn{tr(A)} is the trace of \eqn{A}.
 
-A list:
-\itemize{
-\item I use \eqn{n}{n} to stand for blah.
-\item and so forth....
-}
-\describe{
-\item{a}{value.}
-\item{b}{factor.}
-}
+The code starts from initial estimates and iteratively 
+improves them, maintaining non-negativity.
+This implementation uses the Lee and Seung step direction,
+with a correction to avoid divide-by-zero.
+The iterative step is optionally re-scaled to take the steepest 
+descent in the step direction.
 }
 \note{
 This package provides proof of concept code which is unlikely to be fast
 or robust, and may not solve the optimization problem at hand. User assumes
 all risk.
 }
+\examples{
+
+ set.seed(1234)
+ nr <- 200
+ nc <- 50
+ dm <- 5
+
+ randmat <- function(nr,nc) { matrix(runif(nr*nc),nrow=nr) }
+ set.seed(1234)
+ real_L <- randmat(nr,dm)
+ real_R <- randmat(dm,nc)
+ Y <- real_L \%*\% real_R
+ objective <- function(Y, L, R) { sum((Y - L \%*\% R)^2) }
+ objective(Y,real_L,real_R)
+
+ L_0 <- randmat(nr,dm)
+ R_0 <- randmat(dm,nc)
+ objective(Y,L_0,R_0)
+ out1 <- nmf(Y, L_0, R_0, max_iterations=5e4L,annealing_rate=0.1, check_optimal_step=FALSE,zero_tolerance=1e-13)
+ objective(Y,out1$L,out1$R)
+ out2 <- nmf(Y, out1$L, out1$R, max_iterations=5e4L,annealing_rate=0.1, check_optimal_step=FALSE,zero_tolerance=1e-13)
+ objective(Y,out2$L,out2$R)
+
+
+}
 \references{
 Merritt, Michael, and Zhang, Yin. "Interior-point Gradient Method for Large-Scale Totally 
 Nonnegative Least Squares Problems." Journal of Optimization Theory and Applications 126, 
 no 1 (2005): 191--202. \url{https://scholarship.rice.edu/bitstream/handle/1911/102020/TR04-08.pdf}
+
+Pav, S. E. "An Iterative Algorithm for Regularized Non-negative Matrix Factorizations."
+Forthcoming. (2024)
+
+Lee, Daniel D. and Seung, H. Sebastian. "Algorithms for Non-negative Matrix 
+Factorization." Advances in Neural Information Processing Systems 13 (2001):
+556--562.
+\url{http://papers.nips.cc/paper/1861-algorithms-for-non-negative-matrix-factorization.pdf}
 }
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}

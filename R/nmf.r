@@ -58,11 +58,15 @@ pick_direction <- function(X_k, gradfX_k, F) {
 	# tweak the step:
 	# if you would have division by zero, do not do that, rather just step
 	# in negative gradient direction.
+	# moreover, if X_k is zero and the gradient is negative, allow a step in the
+	# positive direction.
 	Fzer <- F <= 0
 	Xzer <- X_k <= 0
+	grad_neg <- gradfX_k < 0
 	F[Fzer] <- 1
 	H_kp1 <- - gradfX_k * X_k / F
-	H_kp1[Fzer & Xzer] <- pmax(-gradfX_k[Fzer & Xzer], 0)
+	# H_kp1[Fzer & Xzer] <- pmax(-gradfX_k[Fzer & Xzer], 0)
+	H_kp1[Xzer] <- pmax(-gradfX_k[Xzer], 0)
 	return(H_kp1)
 }
 
@@ -86,29 +90,33 @@ tish <- function(X) {
 #'
 #' @description 
 #'
-#' One sentence or so that tells you some more.
+#' Non-negative matrix factorization with regularization.
 #'
 #' @details
 #'
-#' Really detailed. \eqn{\zeta}{zeta}.
+#' Attempts to factor given non-negative matrix \eqn{Y} as the product \eqn{LR}
+#' of two non-negative matrices. The objective function is Frobenius norm
+#' with \eqn{\ell_1} and \eqn{\ell_2} regularization terms.
+#' We seek to minimize the objective
+#' \deqn{\frac{1}{2}tr((Y-LR)' W_{0R} (Y-LR) W_{0C}) + \lambda_{1L} |L| + \lambda_{1R} |R| + \frac{\lambda_{2L}}{2} tr(L'L) + \frac{\lambda_{2R}}{2} tr(R'R),}
+#' subject to \eqn{L \ge 0} and \eqn{R \ge 0} elementwise, 
+#' where \eqn{|A|} is the sum of the elements of \eqn{A} and 
+#' \eqn{tr(A)} is the trace of \eqn{A}.
 #'
-#' A list:
-#' \itemize{
-#' \item I use \eqn{n}{n} to stand for blah.
-#' \item and so forth....
-#' }
-#' \describe{
-#' \item{a}{value.}
-#' \item{b}{factor.}
-#' }
+#' The code starts from initial estimates and iteratively 
+#' improves them, maintaining non-negativity.
+#' This implementation uses the Lee and Seung step direction,
+#' with a correction to avoid divide-by-zero.
+#' The iterative step is optionally re-scaled to take the steepest 
+#' descent in the step direction.
 #'
 #'
 #' @param Y  an \eqn{r \times c} matrix to be decomposed.
-#' Should have non-negative elements, though we do not check.
+#' Should have non-negative elements; an error is thrown otherwise.
 #' @param L  an \eqn{r \times d} matrix of the initial estimate of L.
-#' Should have non-negative elements, though we do not check.
+#' Should have non-negative elements; an error is thrown otherwise.
 #' @param R  an \eqn{d \times c} matrix of the initial estimate of R.
-#' Should have non-negative elements, though we do not check.
+#' Should have non-negative elements; an error is thrown otherwise.
 #' @param W_0R  the row space weighting matrix.
 #' This should be a positive definite non-negative symmetric \eqn{r \times r} matrix.
 #' If omitted, it defaults to the properly sized identity matrix.
@@ -135,9 +143,42 @@ tish <- function(X) {
 #' }
 #' @keywords optimization
 #' @template etc
+#' @template poc
 #' @template ref-merritt
+#' @template ref-pav
+#' @template ref-leeseung
 #'
 #' @examples 
+#'
+#'  nr <- 100
+#'  nc <- 20
+#'  dm <- 4
+#' 
+#'  randmat <- function(nr,nc) { matrix(runif(nr*nc),nrow=nr) }
+#'  set.seed(1234)
+#'  real_L <- randmat(nr,dm)
+#'  real_R <- randmat(dm,nc)
+#'  Y <- real_L %*% real_R
+#' # without regularization
+#'  objective <- function(Y, L, R) { sum((Y - L %*% R)^2) }
+#'  objective(Y,real_L,real_R)
+#' 
+#'  L_0 <- randmat(nr,dm)
+#'  R_0 <- randmat(dm,nc)
+#'  objective(Y,L_0,R_0)
+#'  out1 <- nmf(Y, L_0, R_0, max_iterations=5e4L,check_optimal_step=FALSE)
+#'  objective(Y,out1$L,out1$R)
+#' # with L1 regularization on one side
+#'  out2 <- nmf(Y, L_0, R_0, max_iterations=5e4L,lambda_1L=0.1,check_optimal_step=FALSE)
+#' # objective does not suffer because all mass is shifted to R
+#'  objective(Y,out2$L,out2$R)
+#' list(L1=sum(out1$L),R1=sum(out1$R),L2=sum(out2$L),R2=sum(out2$R))
+#' sum(out2$L)
+#' # with L1 regularization on both sides
+#'  out3 <- nmf(Y, L_0, R_0, max_iterations=5e4L,lambda_1L=0.1,lambda_1R=0.1,check_optimal_step=FALSE)
+#' # with L1 regularization on both sides, raw objective suffers
+#'  objective(Y,out3$L,out3$R)
+#' list(L1=sum(out1$L),R1=sum(out1$R),L3=sum(out3$L),R3=sum(out3$R))
 #'
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @export
@@ -145,12 +186,15 @@ nmf <- function(Y, L, R,
 								W_0R=NULL, W_0C=NULL, 
 								lambda_1L=0, lambda_1R=0, 
 								lambda_2L=0, lambda_2R=0, 
-								tau=0.5, annealing_rate=0.25, 
+								tau=0.5, annealing_rate=0.10, 
 								check_optimal_step=TRUE, 
-								zero_tolerance=1e-9,
+								zero_tolerance=1e-12,
 								max_iterations=1e3L, 
 								min_xstep=1e-9,
 								verbosity=0) {
+	stopifnot(all(Y >= 0))
+	stopifnot(all(L >= 0))
+	stopifnot(all(R >= 0))
 	stopifnot(missing(W_0R) || is.null(W_0R) || all(W_0R >= 0))
 	stopifnot(missing(W_0C) || is.null(W_0C) || all(W_0C >= 0))
 	stopifnot((0 < tau) && (tau < 1))
@@ -204,7 +248,6 @@ nmf <- function(Y, L, R,
 	colnames(R) <- colnames(Y)
 	return(list(L=L,R=R,iterations=k,converged=converged,Lstep=Lstep,Rstep=Rstep))
 }
-
 
 #for vim modeline: (do not edit)
 # vim:fdm=marker:fmr=FOLDUP,UNFOLD:cms=#%s:syn=r:ft=r

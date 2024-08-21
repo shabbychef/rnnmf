@@ -74,7 +74,7 @@ default_stepfunc <- lee_seung_stepfunc
 #'
 #' This implementation allows the user to specify methods to perform matrix by
 #' vector multiplication, computation of the gradient (which should be
-#' \deqn{G x + d}{Gx + d}), and computation of the step direction.
+#' \eqn{G x + d}{Gx + d}), and computation of the step direction.
 #' By default we compute the optimal step in the given step direction.
 #'
 #' @param Gmat  a representation of the matrix \eqn{G}.
@@ -117,6 +117,8 @@ default_stepfunc <- lee_seung_stepfunc
 #' }
 #' @keywords optimization
 #' @template etc
+#' @template poc
+#' @template ref-pav
 #' @template ref-merritt
 #'
 #' @examples 
