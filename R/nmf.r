@@ -147,6 +147,7 @@ tish <- function(X) {
 #' @template ref-merritt
 #' @template ref-pav
 #' @template ref-leeseung
+#' @seealso \code{\link{gnmf}}
 #'
 #' @examples 
 #'
@@ -183,6 +184,139 @@ tish <- function(X) {
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @export
 nmf <- function(Y, L, R, 
+								W_0R=NULL, W_0C=NULL, 
+								lambda_1L=0, lambda_1R=0, 
+								lambda_2L=0, lambda_2R=0, 
+								tau=0.5, annealing_rate=0.10, 
+								check_optimal_step=TRUE, 
+								zero_tolerance=1e-12,
+								max_iterations=1e3L, 
+								min_xstep=1e-9,
+								verbosity=0) {
+	stopifnot(all(Y >= 0))
+	stopifnot(all(L >= 0))
+	stopifnot(all(R >= 0))
+	stopifnot(missing(W_0R) || is.null(W_0R) || all(W_0R >= 0))
+	stopifnot(missing(W_0C) || is.null(W_0C) || all(W_0C >= 0))
+	stopifnot((0 < tau) && (tau < 1))
+	stopifnot((0 <= annealing_rate) && (annealing_rate < 1))
+
+	tau_k <- tau
+	finished <- FALSE
+	k <- 0
+	while (!finished) {
+		tau_k <- (1-annealing_rate) * tau_k + annealing_rate
+		# update L
+		WRt <- (W_0C %**% t(R))
+		RWR <- R %*% WRt
+		D <- lambda_1L - (W_0R %**% Y) %*% WRt
+		F <- (W_0R %**% L) %*% RWR + lambda_2L * L
+		gradfL_k <- D + F
+		H_kp1 <- pick_direction(L, gradfL_k, F)
+		if (check_optimal_step) {
+			K_kp1 <- (W_0R %**% H_kp1) %*% RWR + lambda_2L * H_kp1
+		} else {
+			K_kp1 <- NULL
+		}
+		LList <- gipm_step(L, gradfL_k, H_kp1, K_kp1, tau_k, k, verbosity)
+		L <- LList[[1]]
+		Lstep <- LList[[2]]
+		# update R
+		LtW <- t(L) %**% W_0R
+		LWL <- LtW %*% L
+		D <- lambda_1R - LtW %*% (Y %**% W_0C)
+		F <- LWL %*% (R %**% W_0C) + lambda_2R * R
+		gradfR_k <- D + F
+		H_kp1 <- pick_direction(R, gradfR_k, F)
+		if (check_optimal_step) {
+			K_kp1 <- LWL %*% (H_kp1 %**% W_0C) + lambda_2R * H_kp1
+		} else {
+			K_kp1 <- NULL
+		}
+		RList <- gipm_step(R, gradfR_k, H_kp1, K_kp1, tau_k, k, verbosity)
+		R <- RList[[1]]
+		Rstep <- RList[[2]]
+		R[R <= zero_tolerance] <- 0
+		L[L <= zero_tolerance] <- 0
+		k <- k + 1
+		converged <- (max(c(Lstep,Rstep)) < min_xstep)
+		finished <- converged || (k >= max_iterations) 
+	}
+	if (verbosity > 1) { 
+		print(paste0("terminated after ",k," iterations. converged: ",converged))
+	}
+	rownames(L) <- rownames(Y)
+	colnames(R) <- colnames(Y)
+	return(list(L=L,R=R,iterations=k,converged=converged,Lstep=Lstep,Rstep=Rstep))
+}
+
+#' @title gnmf .
+#'
+#' @description 
+#'
+#' Non-negative matrix factorization with regularization, general form.
+#'
+#' @details
+#'
+#' Attempts to factor given non-negative matrix \eqn{Y} as the product \eqn{LR}
+#' of two non-negative matrices. The objective function is Frobenius norm
+#' with \eqn{\ell_1} and \eqn{\ell_2} regularization terms.
+#' We seek to minimize the objective
+#' \deqn{\frac{1}{2}tr((Y-LR)' W_{0R} (Y-LR) W_{0C}) + tr(W_{1L}'L} + \tr{W_{1R}'R} + \frac{1}{2} \sum_j \tr(L'W_{2RLj}LW_{2CLj}) + \tr{R'W_{2RRj}RW_{2CRj}),}
+#' subject to \eqn{L \ge 0} and \eqn{R \ge 0} elementwise, 
+#' where \eqn{tr(A)} is the trace of \eqn{A}.
+#'
+#' The code starts from initial estimates and iteratively 
+#' improves them, maintaining non-negativity.
+#' This implementation uses the Lee and Seung step direction,
+#' with a correction to avoid divide-by-zero.
+#' The iterative step is optionally re-scaled to take the steepest 
+#' descent in the step direction.
+#'
+#'
+#' @param Y  an \eqn{r \times c} matrix to be decomposed.
+#' Should have non-negative elements; an error is thrown otherwise.
+#' @param L  an \eqn{r \times d} matrix of the initial estimate of L.
+#' Should have non-negative elements; an error is thrown otherwise.
+#' @param R  an \eqn{d \times c} matrix of the initial estimate of R.
+#' Should have non-negative elements; an error is thrown otherwise.
+#' @param W_0R  the row space weighting matrix.
+#' This should be a positive definite non-negative symmetric \eqn{r \times r} matrix.
+#' If omitted, it defaults to the properly sized identity matrix.
+#' @param W_0C  the column space weighting matrix.
+#' This should be a positive definite non-negative symmetric \eqn{c \times c} matrix.
+#' If omitted, it defaults to the properly sized identity matrix.
+#' @param W_1R  the \eqn{\ell_1} penalty matrix for the matrix \eqn{L}.
+#' Defaults to all zeroes matrix.
+#' @param W_1L  the \eqn{\ell_1} penalty matrix for the matrix \eqn{R}.
+#' Defaults to all zeroes matrix.
+#' 2FIX: start here...
+#' @param lambda_2L  the scalar \eqn{\ell_2} penalty for the matrix \eqn{L}.
+#' Defaults to zero.
+#' @param lambda_2R  the scalar \eqn{\ell_2} penalty for the matrix \eqn{R}.
+#' Defaults to zero.
+#' @inheritParams gipm
+#' @return a list with the elements
+#' \describe{
+#' \item{L}{The final estimate of L.}
+#' \item{R}{The final estimate of R.}
+#' \item{Lstep}{The infinity norm of the final step in L}.
+#' \item{Rstep}{The infinity norm of the final step in R}.
+#' \item{iterations}{The number of iterations taken.}
+#' \item{converged}{Whether convergence was detected.}
+#' }
+#' @keywords optimization
+#' @template etc
+#' @template poc
+#' @template ref-merritt
+#' @template ref-pav
+#' @template ref-leeseung
+#' @seealso \code{\link{nmf}}
+#'
+#'
+#' @author Steven E. Pav \email{shabbychef@@gmail.com}
+#' @export
+gnmf <- function(Y, L, R, 
 								W_0R=NULL, W_0C=NULL, 
 								lambda_1L=0, lambda_1R=0, 
 								lambda_2L=0, lambda_2R=0, 
