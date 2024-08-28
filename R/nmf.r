@@ -71,11 +71,14 @@ pick_direction <- function(X_k, gradfX_k, F) {
 }
 
 # like matrix multiplication, but if X or Y is not given or is null, treat as the identity.
+# if one of them is a scalar, treat them as the identity times that scalar.
 `%**%` <- function(X, Y) {
 	if (missing(X) || is.null(X)) {
 		return(Y)
 	} else if (missing(Y) || is.null(Y)) {
 		return(X)
+	} else if (!is.matrix(X) || !is.matrix(Y)) {
+		return(X * Y)
 	}
 	return(X %*% Y)
 }
@@ -286,16 +289,33 @@ nmf <- function(Y, L, R,
 #' @param W_0C  the column space weighting matrix.
 #' This should be a positive definite non-negative symmetric \eqn{c \times c} matrix.
 #' If omitted, it defaults to the properly sized identity matrix.
-#' @param W_1R  the \eqn{\ell_1} penalty matrix for the matrix \eqn{L}.
-#' Defaults to all zeroes matrix.
 #' @param W_1L  the \eqn{\ell_1} penalty matrix for the matrix \eqn{R}.
-#' Defaults to all zeroes matrix.
-#' 2FIX: start here...
-#' @param lambda_2L  the scalar \eqn{\ell_2} penalty for the matrix \eqn{L}.
-#' Defaults to zero.
-#' @param lambda_2R  the scalar \eqn{\ell_2} penalty for the matrix \eqn{R}.
-#' Defaults to zero.
-#' @inheritParams gipm
+#' If a scalar, corresponds to that scalar times the all-ones matrix.
+#' Defaults to all-zeroes matrix, which is no penalty term.
+#' @param W_1R  the \eqn{\ell_1} penalty matrix for the matrix \eqn{L}.
+#' If a scalar, corresponds to that scalar times the all-ones matrix.
+#' Defaults to all-zeroes matrix, which is no penalty term.
+#' @param W_2RL  the \eqn{\ell_2} row penalty matrix for the matrix \eqn{L}.
+#' If a scalar, corresponds to that scalar times the identity matrix.
+#' Can also be a list, in which case \coode{W_2CL} must be a list of the same
+#' length. The list should consist of \eqn{\ell_2} row penalty matrices.
+#' Defaults to all-zeroes matrix, which is no penalty term.
+#' @param W_2CL  the \eqn{\ell_2} column penalty matrix for the matrix \eqn{L}.
+#' If a scalar, corresponds to that scalar times the identity matrix.
+#' Can also be a list, in which case \coode{W_2RL} must be a list of the same
+#' length. The list should consist of \eqn{\ell_2} column penalty matrices.
+#' Defaults to all-zeroes matrix, which is no penalty term.
+#' @param W_2RR  the \eqn{\ell_2} row penalty matrix for the matrix \eqn{R}.
+#' If a scalar, corresponds to that scalar times the identity matrix.
+#' Can also be a list, in which case \coode{W_2CR} must be a list of the same
+#' length. The list should consist of \eqn{\ell_2} row penalty matrices.
+#' Defaults to all-zeroes matrix, which is no penalty term.
+#' @param W_2CR  the \eqn{\ell_2} column penalty matrix for the matrix \eqn{R}.
+#' If a scalar, corresponds to that scalar times the identity matrix.
+#' Can also be a list, in which case \coode{W_2RR} must be a list of the same
+#' length. The list should consist of \eqn{\ell_2} column penalty matrices.
+#' Defaults to all-zeroes matrix, which is no penalty term.
+#' @inheritParams nmf
 #' @return a list with the elements
 #' \describe{
 #' \item{L}{The final estimate of L.}
@@ -318,8 +338,9 @@ nmf <- function(Y, L, R,
 #' @export
 gnmf <- function(Y, L, R, 
 								W_0R=NULL, W_0C=NULL, 
-								lambda_1L=0, lambda_1R=0, 
-								lambda_2L=0, lambda_2R=0, 
+								W_1L=0, W_1R=0,
+								W_2RL=0, W_2CL=0,
+								W_2RR=0, W_2CR=0,
 								tau=0.5, annealing_rate=0.10, 
 								check_optimal_step=TRUE, 
 								zero_tolerance=1e-12,
@@ -331,38 +352,71 @@ gnmf <- function(Y, L, R,
 	stopifnot(all(R >= 0))
 	stopifnot(missing(W_0R) || is.null(W_0R) || all(W_0R >= 0))
 	stopifnot(missing(W_0C) || is.null(W_0C) || all(W_0C >= 0))
+	stopifnot(missing(W_1R) || is.null(W_1R) || all(W_1R >= 0))
+	stopifnot(missing(W_1L) || is.null(W_1L) || all(W_1L >= 0))
 	stopifnot((0 < tau) && (tau < 1))
 	stopifnot((0 <= annealing_rate) && (annealing_rate < 1))
+
+	if (is.list(W_2RL) || is.list(W_2CL)) {
+		stopifnot(is.list(W_2RL) && is.list(W_2CL) && (length(W_2RL) == length(W_2CL)))
+	} else {
+		W_2RL <- list(W_2RL)
+		W_2CL <- list(W_2CL)
+	}
+	W_2L_J <- length(W_2RL)
+
+	if (is.list(W_2RR) || is.list(W_2CR)) {
+		stopifnot(is.list(W_2RR) && is.list(W_2CR) && (length(W_2RR) == length(W_2CR)))
+	} else {
+		W_2RR <- list(W_2RR)
+		W_2CR <- list(W_2CR)
+	}
+	W_2R_J <- length(W_2RR)
+
 
 	tau_k <- tau
 	finished <- FALSE
 	k <- 0
 	while (!finished) {
 		tau_k <- (1-annealing_rate) * tau_k + annealing_rate
+
 		# update L
 		WRt <- (W_0C %**% t(R))
 		RWR <- R %*% WRt
-		D <- lambda_1L - (W_0R %**% Y) %*% WRt
-		F <- (W_0R %**% L) %*% RWR + lambda_2L * L
+		D <- W_1L - (W_0R %**% Y) %*% WRt
+		F <- (W_0R %**% L) %*% RWR 
+		for (jidx in 1:W_2L_J) {
+			F <- F + W_2RL[[jidx]] %**% L %**% W_2CL[[jidx]]
+		}
 		gradfL_k <- D + F
 		H_kp1 <- pick_direction(L, gradfL_k, F)
 		if (check_optimal_step) {
-			K_kp1 <- (W_0R %**% H_kp1) %*% RWR + lambda_2L * H_kp1
+			K_kp1 <- (W_0R %**% H_kp1) %*% RWR 
+			for (jidx in 1:W_2L_J) {
+				K_kp1 <- K_kp1 + W_2RL[[jidx]] %**% H_kp1 %**% W_2CL[[jidx]]
+			}
 		} else {
 			K_kp1 <- NULL
 		}
 		LList <- gipm_step(L, gradfL_k, H_kp1, K_kp1, tau_k, k, verbosity)
 		L <- LList[[1]]
 		Lstep <- LList[[2]]
+
 		# update R
 		LtW <- t(L) %**% W_0R
 		LWL <- LtW %*% L
-		D <- lambda_1R - LtW %*% (Y %**% W_0C)
-		F <- LWL %*% (R %**% W_0C) + lambda_2R * R
+		D <- W_1R - LtW %*% (Y %**% W_0C)
+		F <- LWL %*% (R %**% W_0C) 
+		for (jidx in 1:W_2R_J) {
+			F <- F + W_2RR[[jidx]] %**% R %**% W_2CR[[jidx]]
+		}
 		gradfR_k <- D + F
 		H_kp1 <- pick_direction(R, gradfR_k, F)
 		if (check_optimal_step) {
-			K_kp1 <- LWL %*% (H_kp1 %**% W_0C) + lambda_2R * H_kp1
+			K_kp1 <- LWL %*% (H_kp1 %**% W_0C) 
+			for (jidx in 1:W_2R_J) {
+				K_kp1 <- K_kp1 + W_2RR[[jidx]] %**% H_kp1 %**% W_2CR[[jidx]]
+			}
 		} else {
 			K_kp1 <- NULL
 		}
