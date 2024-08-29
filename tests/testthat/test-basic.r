@@ -34,6 +34,41 @@ randmat <- function(nr,nc,zero_p=0.2) { matrix(pmax(0,runif(nr*nc)-zero_p),nrow=
 
 # just test if everything runs...
 
+context("test giqpm")#FOLDUP
+test_that("giqpm runs",{#FOLDUP
+	set.seed(1234)
+	nr <- 100
+	nc <- 20
+	LL <- randmat(nr,nc)
+	Gmat <- t(LL) %*% LL
+	dvec <- -runif(nc)
+	expect_error(out0 <- giqpm(Gmat, dvec), NA)
+
+	preG <- randmat(nr,nr+nc)
+	G <- preG %*% t(preG)
+	d <- - runif(nr)
+	expect_error(y1 <- giqpm(G, d),NA)
+	objective <- function(G, d, x) { as.numeric(0.5 * t(x) %*% (G %*% x) + t(x) %*% d) }
+
+	# this does not converge to an actual solution!
+	steepest_step_func <- function(gradf, ...) { return(-gradf) }
+	expect_error(y2 <- giqpm(G, d, step_func = steepest_step_func),NA)
+
+	scaled_step_func <- function(gradf, Gx, Gmat, dvec, x0, ...) { return(-gradf * abs(x0)) }
+	expect_error(y3 <- giqpm(G, d, step_func = scaled_step_func),NA)
+
+	sqrt_step_func <- function(gradf, Gx, Gmat, dvec, x0, ...) { return(-gradf * abs(sqrt(x0))) }
+	expect_error(y4 <- giqpm(G, d, step_func = sqrt_step_func),NA)
+
+	complementarity_stepfunc <- function(gradf, Gx, Gmat, dvec, x0, ...) { return(-gradf * x0) }
+	expect_error(y5 <- giqpm(G, d, step_func = complementarity_stepfunc),NA)
+
+	expect_lt(objective(G, d, y4$x), objective(G, d, y2$x))
+	expect_lt(objective(G, d, y1$x), objective(G, d, y4$x))
+	expect_lt(objective(G, d, y3$x), objective(G, d, y4$x))
+	expect_lt(objective(G, d, y5$x), objective(G, d, y4$x))
+})#UNFOLD
+#UNFOLD
 context("test nmf")#FOLDUP
 test_that("nmf runs",{#FOLDUP
 	nr <- 100

@@ -57,6 +57,9 @@ weird_stepfunc <- function(gradf, Gx, Gmat, dvec, x0, multfunc) {
 	raty[Gb != 0] <- b[Gb != 0] / Gb[Gb != 0]
 	return(-gradf * raty)
 }
+complementarity_stepfunc <- function(gradf, Gx, Gmat, dvec, x0, ...) {
+	return(-gradf * x0)
+}
 default_stepfunc <- lee_seung_stepfunc
 
 
@@ -140,11 +143,15 @@ default_stepfunc <- lee_seung_stepfunc
 #'
 #' sqrt_step_func <- function(gradf, Gx, Gmat, dvec, x0, ...) { return(-gradf * abs(sqrt(x0))) }
 #' y4 <- giqpm(G, d, step_func = sqrt_step_func)
+#' 
+#' complementarity_stepfunc <- function(gradf, Gx, Gmat, dvec, x0, ...) { return(-gradf * x0) }
+#' y5 <- giqpm(G, d, step_func = complementarity_stepfunc)
 #'
 #' objective(G, d, y1$x)
 #' objective(G, d, y2$x)
 #' objective(G, d, y3$x)
 #' objective(G, d, y4$x)
+#' objective(G, d, y5$x)
 #'
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @export
