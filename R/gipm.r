@@ -60,11 +60,11 @@ weird_stepfunc <- function(gradf, Gx, Gmat, dvec, x0, multfunc) {
 default_stepfunc <- lee_seung_stepfunc
 
 
-#' @title gipm .
+#' @title giqpm .
 #'
 #' @description 
 #'
-#' Generalized Interior Point Method for non-negative quadratic optimization.
+#' Generalized Iterative Quadratic Programming Method for non-negative quadratic optimization.
 #'
 #' @details
 #'
@@ -128,18 +128,18 @@ default_stepfunc <- lee_seung_stepfunc
 #' preG <- matrix(runif(ssiz*(ssiz+20)),nrow=ssiz)
 #' G <- preG %*% t(preG)
 #' d <- - runif(ssiz)
-#' y1 <- gipm(G, d)
+#' y1 <- giqpm(G, d)
 #' objective <- function(G, d, x) { as.numeric(0.5 * t(x) %*% (G %*% x) + t(x) %*% d) }
 #'
 #' # this does not converge to an actual solution!
 #' steepest_step_func <- function(gradf, ...) { return(-gradf) }
-#' y2 <- gipm(G, d, step_func = steepest_step_func)
+#' y2 <- giqpm(G, d, step_func = steepest_step_func)
 #'
 #' scaled_step_func <- function(gradf, Gx, Gmat, dvec, x0, ...) { return(-gradf * abs(x0)) }
-#' y3 <- gipm(G, d, step_func = scaled_step_func)
+#' y3 <- giqpm(G, d, step_func = scaled_step_func)
 #'
 #' sqrt_step_func <- function(gradf, Gx, Gmat, dvec, x0, ...) { return(-gradf * abs(sqrt(x0))) }
-#' y4 <- gipm(G, d, step_func = sqrt_step_func)
+#' y4 <- giqpm(G, d, step_func = sqrt_step_func)
 #'
 #' objective(G, d, y1$x)
 #' objective(G, d, y2$x)
@@ -148,7 +148,7 @@ default_stepfunc <- lee_seung_stepfunc
 #'
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @export
-gipm <- function(Gmat, dvec, x0=NULL, 
+giqpm <- function(Gmat, dvec, x0=NULL, 
 								 tau=0.5, annealing_rate=0.25,
 								 check_optimal_step=TRUE,
 								 mult_func=NULL,
