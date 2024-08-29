@@ -134,7 +134,7 @@ tish <- function(X) {
 #' Defaults to zero.
 #' @param lambda_2R  the scalar \eqn{\ell_2} penalty for the matrix \eqn{R}.
 #' Defaults to zero.
-#' @inheritParams gipm
+#' @inheritParams giqpm
 #' @return a list with the elements
 #' \describe{
 #' \item{L}{The final estimate of L.}
@@ -265,7 +265,7 @@ nmf <- function(Y, L, R,
 #' of two non-negative matrices. The objective function is Frobenius norm
 #' with \eqn{\ell_1} and \eqn{\ell_2} regularization terms.
 #' We seek to minimize the objective
-#' \deqn{\frac{1}{2}tr((Y-LR)' W_{0R} (Y-LR) W_{0C}) + tr(W_{1L}'L} + \tr{W_{1R}'R} + \frac{1}{2} \sum_j \tr(L'W_{2RLj}LW_{2CLj}) + \tr{R'W_{2RRj}RW_{2CRj}),}
+#' \deqn{\frac{1}{2}tr((Y-LR)' W_{0R} (Y-LR) W_{0C}) + tr(W_{1L}'L) + tr(W_{1R}'R) + \frac{1}{2} \sum_j tr(L'W_{2RLj}LW_{2CLj}) + tr(R'W_{2RRj}RW_{2CRj}),}
 #' subject to \eqn{L \ge 0} and \eqn{R \ge 0} elementwise, 
 #' where \eqn{tr(A)} is the trace of \eqn{A}.
 #'
@@ -297,22 +297,22 @@ nmf <- function(Y, L, R,
 #' Defaults to all-zeroes matrix, which is no penalty term.
 #' @param W_2RL  the \eqn{\ell_2} row penalty matrix for the matrix \eqn{L}.
 #' If a scalar, corresponds to that scalar times the identity matrix.
-#' Can also be a list, in which case \coode{W_2CL} must be a list of the same
+#' Can also be a list, in which case \code{W_2CL} must be a list of the same
 #' length. The list should consist of \eqn{\ell_2} row penalty matrices.
 #' Defaults to all-zeroes matrix, which is no penalty term.
 #' @param W_2CL  the \eqn{\ell_2} column penalty matrix for the matrix \eqn{L}.
 #' If a scalar, corresponds to that scalar times the identity matrix.
-#' Can also be a list, in which case \coode{W_2RL} must be a list of the same
+#' Can also be a list, in which case \code{W_2RL} must be a list of the same
 #' length. The list should consist of \eqn{\ell_2} column penalty matrices.
 #' Defaults to all-zeroes matrix, which is no penalty term.
 #' @param W_2RR  the \eqn{\ell_2} row penalty matrix for the matrix \eqn{R}.
 #' If a scalar, corresponds to that scalar times the identity matrix.
-#' Can also be a list, in which case \coode{W_2CR} must be a list of the same
+#' Can also be a list, in which case \code{W_2CR} must be a list of the same
 #' length. The list should consist of \eqn{\ell_2} row penalty matrices.
 #' Defaults to all-zeroes matrix, which is no penalty term.
 #' @param W_2CR  the \eqn{\ell_2} column penalty matrix for the matrix \eqn{R}.
 #' If a scalar, corresponds to that scalar times the identity matrix.
-#' Can also be a list, in which case \coode{W_2RR} must be a list of the same
+#' Can also be a list, in which case \code{W_2RR} must be a list of the same
 #' length. The list should consist of \eqn{\ell_2} column penalty matrices.
 #' Defaults to all-zeroes matrix, which is no penalty term.
 #' @inheritParams nmf

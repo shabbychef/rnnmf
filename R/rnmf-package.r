@@ -39,18 +39,19 @@
 #'
 #' Pav, Steven E. "System and method for unmixing spectroscopic observations with nonnegative 
 #' matrix factorization." US Patent 8140272, 2012.
-#' \urel{https://patentscope.wipo.int/search/en/detail.jsf?docId=US42758160}
+#' \url{https://patentscope.wipo.int/search/en/detail.jsf?docId=US42758160}
 #'
 #' @name rnmf
 #' @rdname rnmf
 #' @docType package
 #' @title regularized non-negative matrix factorization
 #' @keywords package
+#' @keywords internal
 #' @note
 #' 
 #' This package is maintained as a hobby. 
 #'
-NULL
+"_PACKAGE"
 
 #' @title News for package 'rnmf':
 #'

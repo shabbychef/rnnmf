@@ -5,7 +5,7 @@ Authors@R: c(person(c("Steven", "E."), "Pav",
     email="shabbychef@gmail.com",
     comment = c(ORCID = "0000-0002-4197-6195")))
 Version: 0.1.0.0003
-Date: 2024-08-20
+Date: 2024-08-28
 License: LGPL-3
 Title: Regularized Non-negative Matrix Factorization
 BugReports: https://github.com/shabbychef/rnmf/issues
@@ -21,6 +21,7 @@ Suggests:
 URL: https://github.com/shabbychef/rnmf
 VignetteBuilder: knitr
 Collate:
-    'gipm.r'
+    'giqpm.r'
     'nmf.r'
-    'rnmf.r'
+    'rnmf-package.r'
+RoxygenNote: 7.3.2
