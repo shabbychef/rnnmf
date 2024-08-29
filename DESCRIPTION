@@ -22,6 +22,6 @@ URL: https://github.com/shabbychef/rnmf
 VignetteBuilder: knitr
 Collate:
     'giqpm.r'
-    'nmf.r'
     'rnmf-package.r'
+    'rnmf.r'
 RoxygenNote: 7.3.2
