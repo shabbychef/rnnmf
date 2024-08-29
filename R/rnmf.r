@@ -23,7 +23,7 @@
 # Author: Steven E. Pav <steven@gilgamath.com>
 # Comments: Steven E. Pav
 
-gipm_step <- function(X_k, gradfX_k, H_kp1, K_kp1, tau_k, k, verbosity) {
+giqpm_step <- function(X_k, gradfX_k, H_kp1, K_kp1, tau_k, k, verbosity) {
 		# check for positive or zero values in hstep?
 		checkus <- H_kp1 < 0
 		if (any(checkus)) {
@@ -221,7 +221,7 @@ nmf <- function(Y, L, R,
 		} else {
 			K_kp1 <- NULL
 		}
-		LList <- gipm_step(L, gradfL_k, H_kp1, K_kp1, tau_k, k, verbosity)
+		LList <- giqpm_step(L, gradfL_k, H_kp1, K_kp1, tau_k, k, verbosity)
 		L <- LList[[1]]
 		Lstep <- LList[[2]]
 		# update R
@@ -236,7 +236,7 @@ nmf <- function(Y, L, R,
 		} else {
 			K_kp1 <- NULL
 		}
-		RList <- gipm_step(R, gradfR_k, H_kp1, K_kp1, tau_k, k, verbosity)
+		RList <- giqpm_step(R, gradfR_k, H_kp1, K_kp1, tau_k, k, verbosity)
 		R <- RList[[1]]
 		Rstep <- RList[[2]]
 		R[R <= zero_tolerance] <- 0
@@ -398,7 +398,7 @@ gnmf <- function(Y, L, R,
 		} else {
 			K_kp1 <- NULL
 		}
-		LList <- gipm_step(L, gradfL_k, H_kp1, K_kp1, tau_k, k, verbosity)
+		LList <- giqpm_step(L, gradfL_k, H_kp1, K_kp1, tau_k, k, verbosity)
 		L <- LList[[1]]
 		Lstep <- LList[[2]]
 
@@ -420,7 +420,7 @@ gnmf <- function(Y, L, R,
 		} else {
 			K_kp1 <- NULL
 		}
-		RList <- gipm_step(R, gradfR_k, H_kp1, K_kp1, tau_k, k, verbosity)
+		RList <- giqpm_step(R, gradfR_k, H_kp1, K_kp1, tau_k, k, verbosity)
 		R <- RList[[1]]
 		Rstep <- RList[[2]]
 		R[R <= zero_tolerance] <- 0
