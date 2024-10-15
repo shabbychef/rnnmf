@@ -112,10 +112,14 @@ y3 <- giqpm(G, d, step_func = scaled_step_func)
 sqrt_step_func <- function(gradf, Gx, Gmat, dvec, x0, ...) { return(-gradf * abs(sqrt(x0))) }
 y4 <- giqpm(G, d, step_func = sqrt_step_func)
 
+complementarity_stepfunc <- function(gradf, Gx, Gmat, dvec, x0, ...) { return(-gradf * x0) }
+y5 <- giqpm(G, d, step_func = complementarity_stepfunc)
+
 objective(G, d, y1$x)
 objective(G, d, y2$x)
 objective(G, d, y3$x)
 objective(G, d, y4$x)
+objective(G, d, y5$x)
 
 }
 \references{

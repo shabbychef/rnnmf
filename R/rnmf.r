@@ -190,7 +190,7 @@ nmf <- function(Y, L, R,
 								W_0R=NULL, W_0C=NULL, 
 								lambda_1L=0, lambda_1R=0, 
 								lambda_2L=0, lambda_2R=0, 
-								tau=0.5, annealing_rate=0.10, 
+								tau=0.1, annealing_rate=0.01, 
 								check_optimal_step=TRUE, 
 								zero_tolerance=1e-12,
 								max_iterations=1e3L, 
@@ -333,6 +333,43 @@ nmf <- function(Y, L, R,
 #' @template ref-leeseung
 #' @seealso \code{\link{nmf}}
 #'
+#' @examples 
+#'
+#'  nr <- 20
+#'  nc <- 5
+#'  dm <- 2
+#'  
+#'  randmat <- function(nr,nc) { matrix(runif(nr*nc),nrow=nr) }
+#'  set.seed(1234)
+#'  real_L <- randmat(nr,dm+2)
+#'  real_R <- randmat(ncol(real_L),nc)
+#'  Y <- real_L %*% real_R
+#'  gram_it <- function(G) { t(G) %*% G }
+#'  W_0R <- gram_it(randmat(nr+5,nr))
+#'  W_0C <- gram_it(randmat(nc+5,nc))
+#'  
+#'  wt_objective <- function(Y, L, R, W_0R, W_0C) { 
+#'    err <- Y - L %*% R
+#'    0.5 * sum((err %*% W_0C) * (t(W_0R) %*% err))
+#'  }
+#'  matrix_trace <- function(G) {
+#'    sum(diag(G))
+#'  }
+#'  wt_objective(Y,real_L,real_R,W_0R,W_0C)
+#'  
+#'  L_0 <- randmat(nr,dm)
+#'  R_0 <- randmat(dm,nc)
+#'  wt_objective(Y,L_0,R_0,W_0R,W_0C)
+#'  out1 <- gnmf(Y, L_0, R_0, W_0R=W_0R, W_0C=W_0C, max_iterations=1e5L,check_optimal_step=FALSE)
+#'  wt_objective(Y,out1$L,out1$R,W_0R,W_0C)
+#'  
+#'  W_1L <- randmat(nr,dm)
+#'  out2 <- gnmf(Y, out1$L, out1$R, W_0R=W_0R, W_0C=W_0C, W_1L=W_1L, max_iterations=1e5L,check_optimal_step=FALSE)
+#'  wt_objective(Y,out2$L,out2$R,W_0R,W_0C)
+#'  
+#'  W_1R <- randmat(dm,nc)
+#'  out3 <- gnmf(Y, out2$L, out2$R, W_0R=W_0R, W_0C=W_0C, W_1R=W_1R, max_iterations=1e5L,check_optimal_step=FALSE)
+#'  wt_objective(Y,out3$L,out3$R,W_0R,W_0C)
 #'
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @export
@@ -341,7 +378,7 @@ gnmf <- function(Y, L, R,
 								W_1L=0, W_1R=0,
 								W_2RL=0, W_2CL=0,
 								W_2RR=0, W_2CR=0,
-								tau=0.5, annealing_rate=0.10, 
+								tau=0.1, annealing_rate=0.01, 
 								check_optimal_step=TRUE, 
 								zero_tolerance=1e-12,
 								max_iterations=1e3L, 
