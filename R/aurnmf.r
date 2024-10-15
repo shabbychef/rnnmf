@@ -100,7 +100,7 @@ times_orth <- function(M) {
 #'
 #' @description 
 #'
-#' Additive Update Non-negative matrix factorization with regularization.
+#' Additive update Non-negative matrix factorization with regularization.
 #'
 #' @details
 #'
@@ -162,7 +162,7 @@ times_orth <- function(M) {
 #' @template ref-merritt
 #' @template ref-pav
 #' @template ref-leeseung
-#' @seealso \code{\link{gnmf}}, \code{\link{murnmf}}.
+#' @seealso \code{\link{gaurnmf}}, \code{\link{murnmf}}.
 #'
 #' @examples 
 #'
@@ -283,11 +283,11 @@ aurnmf <- function(Y, L, R,
 	return(list(L=L,R=R,iterations=k,converged=converged,Lstep=Lstep,Rstep=Rstep))
 }
 
-#' @title gnmf .
+#' @title gaurnmf .
 #'
 #' @description 
 #'
-#' Non-negative matrix factorization with regularization, general form.
+#' Additive update Non-negative matrix factorization with regularization, general form.
 #'
 #' @details
 #'
@@ -390,30 +390,30 @@ aurnmf <- function(Y, L, R,
 #'  L_0 <- randmat(nr,dm)
 #'  R_0 <- randmat(dm,nc)
 #'  wt_objective(Y,L_0,R_0,W_0R,W_0C)
-#'  out1 <- gnmf(Y, L_0, R_0, W_0R=W_0R, W_0C=W_0C, max_iterations=1e5L,check_optimal_step=FALSE)
+#'  out1 <- gaurnmf(Y, L_0, R_0, W_0R=W_0R, W_0C=W_0C, max_iterations=1e5L,check_optimal_step=FALSE)
 #'  wt_objective(Y,out1$L,out1$R,W_0R,W_0C)
 #'  
 #'  W_1L <- randmat(nr,dm)
-#'  out2 <- gnmf(Y, out1$L, out1$R, W_0R=W_0R, W_0C=W_0C, W_1L=W_1L, max_iterations=1e5L,check_optimal_step=FALSE)
+#'  out2 <- gaurnmf(Y, out1$L, out1$R, W_0R=W_0R, W_0C=W_0C, W_1L=W_1L, max_iterations=1e5L,check_optimal_step=FALSE)
 #'  wt_objective(Y,out2$L,out2$R,W_0R,W_0C)
 #'  
 #'  W_1R <- randmat(dm,nc)
-#'  out3 <- gnmf(Y, out2$L, out2$R, W_0R=W_0R, W_0C=W_0C, W_1R=W_1R, max_iterations=1e5L,check_optimal_step=FALSE)
+#'  out3 <- gaurnmf(Y, out2$L, out2$R, W_0R=W_0R, W_0C=W_0C, W_1R=W_1R, max_iterations=1e5L,check_optimal_step=FALSE)
 #'  wt_objective(Y,out3$L,out3$R,W_0R,W_0C)
 #'
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @export
-gnmf <- function(Y, L, R, 
-								W_0R=NULL, W_0C=NULL, 
-								W_1L=0, W_1R=0,
-								W_2RL=0, W_2CL=0,
-								W_2RR=0, W_2CR=0,
-								tau=0.1, annealing_rate=0.01, 
-								check_optimal_step=TRUE, 
-								zero_tolerance=1e-12,
-								max_iterations=1e3L, 
-								min_xstep=1e-9,
-								verbosity=0) {
+gaurnmf <- function(Y, L, R, 
+										W_0R=NULL, W_0C=NULL, 
+										W_1L=0, W_1R=0,
+										W_2RL=0, W_2CL=0,
+										W_2RR=0, W_2CR=0,
+										tau=0.1, annealing_rate=0.01, 
+										check_optimal_step=TRUE, 
+										zero_tolerance=1e-12,
+										max_iterations=1e3L, 
+										min_xstep=1e-9,
+										verbosity=0) {
 	stopifnot(all(Y >= 0))
 	stopifnot(all(L >= 0))
 	stopifnot(all(R >= 0))

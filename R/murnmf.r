@@ -44,7 +44,7 @@
 #' @template ref-merritt
 #' @template ref-pav
 #' @template ref-leeseung
-#' @seealso \code{\link{aurnmf}}
+#' @seealso \code{\link{aurnmf}}, \code{\link{gaurnmf}}
 #' @examples 
 #'
 #'  nr <- 100

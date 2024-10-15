@@ -127,8 +127,8 @@ test_that("murnmf runs",{#FOLDUP
 
 })#UNFOLD
 #UNFOLD
-context("test gnmf")#FOLDUP
-test_that("gnmf runs",{#FOLDUP
+context("test gaurnmf")#FOLDUP
+test_that("gaurnmf runs",{#FOLDUP
 	nr <- 100
 	nc <- 20
 	dm <- 4
@@ -142,24 +142,24 @@ test_that("gnmf runs",{#FOLDUP
 
 	L_0 <- randmat(nr,dm)
 	R_0 <- randmat(dm,nc)
-	expect_error(out1 <- gnmf(Y, L_0, R_0, max_iterations=5e3L,check_optimal_step=FALSE),NA)
+	expect_error(out1 <- gaurnmf(Y, L_0, R_0, max_iterations=5e3L,check_optimal_step=FALSE),NA)
 
 	# with L1 regularizations
 	W_1L <- randmat(nrow(L_0), ncol(L_0))
 	W_1R <- randmat(nrow(R_0), ncol(R_0))
-	expect_error(out2 <- gnmf(Y, L_0, R_0, W_1L=W_1L, W_1R=W_1R, max_iterations=5e2L,check_optimal_step=FALSE),NA)
-	expect_error(out2 <- gnmf(Y, L_0, R_0, W_1L=W_1L, W_1R=0, max_iterations=5e2L,check_optimal_step=FALSE),NA)
-	expect_error(out2 <- gnmf(Y, L_0, R_0, W_1L=0, W_1R=W_1R, max_iterations=5e2L,check_optimal_step=FALSE),NA)
+	expect_error(out2 <- gaurnmf(Y, L_0, R_0, W_1L=W_1L, W_1R=W_1R, max_iterations=5e2L,check_optimal_step=FALSE),NA)
+	expect_error(out2 <- gaurnmf(Y, L_0, R_0, W_1L=W_1L, W_1R=0, max_iterations=5e2L,check_optimal_step=FALSE),NA)
+	expect_error(out2 <- gaurnmf(Y, L_0, R_0, W_1L=0, W_1R=W_1R, max_iterations=5e2L,check_optimal_step=FALSE),NA)
 
 	# with L2 regularizations
 	W_2RL <- randmat(nrow(L_0), nrow(L_0))
 	W_2CL <- randmat(ncol(L_0), ncol(L_0))
 	W_2RR <- randmat(nrow(R_0), nrow(R_0))
 	W_2CR <- randmat(ncol(R_0), ncol(R_0))
-	expect_error(out3 <- gnmf(Y, L_0, R_0, W_1L=0, W_1R=W_1R, 
+	expect_error(out3 <- gaurnmf(Y, L_0, R_0, W_1L=0, W_1R=W_1R, 
 														W_2RL=W_2RL,W_2CL=W_2CL,W_2RR=W_2RR,W_2CR=W_2CR,
 														max_iterations=5e2L,check_optimal_step=FALSE),NA)
-	expect_error(out3 <- gnmf(Y, L_0, R_0, W_1L=0, W_1R=W_1R, 
+	expect_error(out3 <- gaurnmf(Y, L_0, R_0, W_1L=0, W_1R=W_1R, 
 														W_2RL=list(W_2RL),W_2CL=list(W_2CL),W_2RR=list(W_2RR),W_2CR=list(W_2CR),
 														max_iterations=5e2L,check_optimal_step=FALSE),NA)
 
@@ -168,10 +168,10 @@ test_that("gnmf runs",{#FOLDUP
 	W_2CL1 <- randmat(ncol(L_0), ncol(L_0))
 	W_2RL2 <- randmat(nrow(L_0), nrow(L_0))
 	W_2CL2 <- randmat(ncol(L_0), ncol(L_0))
-	expect_error(out4 <- gnmf(Y, L_0, R_0, W_1L=0, W_1R=W_1R, 
+	expect_error(out4 <- gaurnmf(Y, L_0, R_0, W_1L=0, W_1R=W_1R, 
 														W_2RL=list(W_2RL1,W_2RL2),W_2CL=list(W_2CL1,W_2CL2),W_2RR=list(W_2RR),W_2CR=list(W_2CR),
 														max_iterations=5e2L,check_optimal_step=FALSE),NA)
-	expect_error(out4 <- gnmf(Y, L_0, R_0, W_1L=0, W_1R=W_1R, 
+	expect_error(out4 <- gaurnmf(Y, L_0, R_0, W_1L=0, W_1R=W_1R, 
 														W_2RL=list(W_2RL1,W_2RL2),W_2CL=list(W_2CL1,W_2CL2),W_2RR=list(W_2RR,0.2),W_2CR=list(W_2CR,0.2),
 														max_iterations=5e2L,check_optimal_step=FALSE),NA)
 
