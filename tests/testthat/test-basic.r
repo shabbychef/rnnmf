@@ -69,8 +69,8 @@ test_that("giqpm runs",{#FOLDUP
 	expect_lt(objective(G, d, y5$x), objective(G, d, y4$x))
 })#UNFOLD
 #UNFOLD
-context("test nmf")#FOLDUP
-test_that("nmf runs",{#FOLDUP
+context("test aurnmf")#FOLDUP
+test_that("aurnmf runs",{#FOLDUP
 	nr <- 100
 	nc <- 20
 	dm <- 4
@@ -85,16 +85,16 @@ test_that("nmf runs",{#FOLDUP
 	L_0 <- randmat(nr,dm)
 	R_0 <- randmat(dm,nc)
 	for (check_optimal_step in c(TRUE, FALSE)) {
-		expect_error(out1 <- nmf(Y, L_0, R_0, max_iterations=5e3L,check_optimal_step=check_optimal_step),NA)
+		expect_error(out1 <- aurnmf(Y, L_0, R_0, max_iterations=5e3L,check_optimal_step=check_optimal_step),NA)
 
 		# with L1 regularization on one side
-		expect_error(out2 <- nmf(Y, L_0, R_0, max_iterations=5e3L,lambda_1L=0.1,check_optimal_step=check_optimal_step),NA)
+		expect_error(out2 <- aurnmf(Y, L_0, R_0, max_iterations=5e3L,lambda_1L=0.1,check_optimal_step=check_optimal_step),NA)
 
 		# with L1 regularization on both sides
-		expect_error(out3 <- nmf(Y, L_0, R_0, max_iterations=5e3L,lambda_1L=0.1,lambda_1R=0.1,check_optimal_step=check_optimal_step),NA)
+		expect_error(out3 <- aurnmf(Y, L_0, R_0, max_iterations=5e3L,lambda_1L=0.1,lambda_1R=0.1,check_optimal_step=check_optimal_step),NA)
 
 		# with non-orthogonality penalty
-		expect_error(out4 <- nmf(Y, L_0, R_0, max_iterations=5e3L,lambda_1L=0.1,lambda_1R=0.1,gamma_2L=0.1,gamma_2R=0.1,check_optimal_step=check_optimal_step),NA)
+		expect_error(out4 <- aurnmf(Y, L_0, R_0, max_iterations=5e3L,lambda_1L=0.1,lambda_1R=0.1,gamma_2L=0.1,gamma_2R=0.1,check_optimal_step=check_optimal_step),NA)
 	}
 
 })#UNFOLD

@@ -37,14 +37,14 @@
 #' than research and experimentation.
 #'
 #' @param epsilon  the numerator clipping value.
-#' @inherit nmf return params details references 
+#' @inherit aurnmf return params details references 
 #' @keywords optimization
 #' @template etc
 #' @template poc
 #' @template ref-merritt
 #' @template ref-pav
 #' @template ref-leeseung
-#' @seealso \code{\link{nmf}}
+#' @seealso \code{\link{aurnmf}}
 #' @examples 
 #'
 #'  nr <- 100

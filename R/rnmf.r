@@ -100,7 +100,7 @@ times_orth <- function(M) {
 #'
 #' @description 
 #'
-#' Non-negative matrix factorization with regularization.
+#' Additive Update Non-negative matrix factorization with regularization.
 #'
 #' @details
 #'
@@ -182,33 +182,33 @@ times_orth <- function(M) {
 #'  L_0 <- randmat(nr,dm)
 #'  R_0 <- randmat(dm,nc)
 #'  objective(Y,L_0,R_0)
-#'  out1 <- nmf(Y, L_0, R_0, max_iterations=5e4L,check_optimal_step=FALSE)
+#'  out1 <- aurnmf(Y, L_0, R_0, max_iterations=5e4L,check_optimal_step=FALSE)
 #'  objective(Y,out1$L,out1$R)
 #' # with L1 regularization on one side
-#'  out2 <- nmf(Y, L_0, R_0, max_iterations=5e4L,lambda_1L=0.1,check_optimal_step=FALSE)
+#'  out2 <- aurnmf(Y, L_0, R_0, max_iterations=5e4L,lambda_1L=0.1,check_optimal_step=FALSE)
 #' # objective does not suffer because all mass is shifted to R
 #'  objective(Y,out2$L,out2$R)
 #' list(L1=sum(out1$L),R1=sum(out1$R),L2=sum(out2$L),R2=sum(out2$R))
 #' sum(out2$L)
 #' # with L1 regularization on both sides
-#'  out3 <- nmf(Y, L_0, R_0, max_iterations=5e4L,lambda_1L=0.1,lambda_1R=0.1,check_optimal_step=FALSE)
+#'  out3 <- aurnmf(Y, L_0, R_0, max_iterations=5e4L,lambda_1L=0.1,lambda_1R=0.1,check_optimal_step=FALSE)
 #' # with L1 regularization on both sides, raw objective suffers
 #'  objective(Y,out3$L,out3$R)
 #' list(L1=sum(out1$L),R1=sum(out1$R),L3=sum(out3$L),R3=sum(out3$R))
 #'
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @export
-nmf <- function(Y, L, R, 
-								W_0R=NULL, W_0C=NULL, 
-								lambda_1L=0, lambda_1R=0, 
-								lambda_2L=0, lambda_2R=0, 
-								gamma_2L=0,  gamma_2R=0,
-								tau=0.1, annealing_rate=0.01, 
-								check_optimal_step=TRUE, 
-								zero_tolerance=1e-12,
-								max_iterations=1e3L, 
-								min_xstep=1e-9,
-								verbosity=0) {
+aurnmf <- function(Y, L, R, 
+									 W_0R=NULL, W_0C=NULL, 
+									 lambda_1L=0, lambda_1R=0, 
+									 lambda_2L=0, lambda_2R=0, 
+									 gamma_2L=0,  gamma_2R=0,
+									 tau=0.1, annealing_rate=0.01, 
+									 check_optimal_step=TRUE, 
+									 zero_tolerance=1e-12,
+									 max_iterations=1e3L, 
+									 min_xstep=1e-9,
+									 verbosity=0) {
 	stopifnot(all(Y >= 0))
 	stopifnot(all(L >= 0))
 	stopifnot(all(R >= 0))
@@ -345,7 +345,7 @@ nmf <- function(Y, L, R,
 #' Can also be a list, in which case \code{W_2RR} must be a list of the same
 #' length. The list should consist of \eqn{\ell_2} column penalty matrices.
 #' Defaults to all-zeroes matrix, which is no penalty term.
-#' @inheritParams nmf
+#' @inheritParams aurnmf
 #' @return a list with the elements
 #' \describe{
 #' \item{L}{The final estimate of L.}
@@ -361,7 +361,7 @@ nmf <- function(Y, L, R,
 #' @template ref-merritt
 #' @template ref-pav
 #' @template ref-leeseung
-#' @seealso \code{\link{nmf}}
+#' @seealso \code{\link{aurnmf}}
 #'
 #' @examples 
 #'

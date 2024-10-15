@@ -184,7 +184,7 @@ Factorization." Advances in Neural Information Processing Systems 13 (2001):
 \url{http://papers.nips.cc/paper/1861-algorithms-for-non-negative-matrix-factorization.pdf}
 }
 \seealso{
-\code{\link{nmf}}
+\code{\link{aurnmf}}
 }
 \author{
 Steven E. Pav \email{shabbychef@gmail.com}
