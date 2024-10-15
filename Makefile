@@ -8,9 +8,10 @@
 ############### FLAGS ###############
 
 VMAJOR 						 = 0
-VMINOR 						 = 1
+VMINOR 						 = 2
 VPATCH  					 = 0
-VDEV 							 = .9001
+# VDEV 							 = .9001
+VDEV 							 = 
 PKG_NAME 					:= rnmf
 
 RPKG_USES_RCPP 		:= 0
