@@ -89,6 +89,13 @@ tish <- function(X) {
 		return(t(X))
 	}
 }
+
+# multiplies matrix M times (11'-I)
+times_orth <- function(M) {
+	# alternatively: M %*% (1 - diag(ncol(M)))
+	matrix(rep(rowSums(M),ncol(M)),ncol=ncol(M),byrow=FALSE) - M
+}
+
 #' @title nmf .
 #'
 #' @description 
@@ -101,7 +108,7 @@ tish <- function(X) {
 #' of two non-negative matrices. The objective function is Frobenius norm
 #' with \eqn{\ell_1} and \eqn{\ell_2} regularization terms.
 #' We seek to minimize the objective
-#' \deqn{\frac{1}{2}tr((Y-LR)' W_{0R} (Y-LR) W_{0C}) + \lambda_{1L} |L| + \lambda_{1R} |R| + \frac{\lambda_{2L}}{2} tr(L'L) + \frac{\lambda_{2R}}{2} tr(R'R),}
+#' \deqn{\frac{1}{2}tr((Y-LR)' W_{0R} (Y-LR) W_{0C}) + \lambda_{1L} |L| + \lambda_{1R} |R| + \frac{\lambda_{2L}}{2} tr(L'L) + \frac{\lambda_{2R}}{2} tr(R'R) + \frac{\gamma_{2L}}{2} tr((L'L) (11' - I)) + \frac{\gamma_{2R}}{2} tr((R'R) (11' - I)),}
 #' subject to \eqn{L \ge 0} and \eqn{R \ge 0} elementwise, 
 #' where \eqn{|A|} is the sum of the elements of \eqn{A} and 
 #' \eqn{tr(A)} is the trace of \eqn{A}.
@@ -134,6 +141,11 @@ tish <- function(X) {
 #' Defaults to zero.
 #' @param lambda_2R  the scalar \eqn{\ell_2} penalty for the matrix \eqn{R}.
 #' Defaults to zero.
+#' @param gamma_2L  the scalar \eqn{\ell_2} penalty for non-orthogonality of the matrix \eqn{L}.
+#' Defaults to zero.
+#' @param gamma_2R  the scalar \eqn{\ell_2} penalty for non-orthogonality of the matrix \eqn{R}.
+#' Defaults to zero.
+#'
 #' @inheritParams giqpm
 #' @return a list with the elements
 #' \describe{
@@ -150,7 +162,7 @@ tish <- function(X) {
 #' @template ref-merritt
 #' @template ref-pav
 #' @template ref-leeseung
-#' @seealso \code{\link{gnmf}}
+#' @seealso \code{\link{gnmf}}, \code{\link{murnmf}}.
 #'
 #' @examples 
 #'
@@ -190,6 +202,7 @@ nmf <- function(Y, L, R,
 								W_0R=NULL, W_0C=NULL, 
 								lambda_1L=0, lambda_1R=0, 
 								lambda_2L=0, lambda_2R=0, 
+								gamma_2L=0,  gamma_2R=0,
 								tau=0.1, annealing_rate=0.01, 
 								check_optimal_step=TRUE, 
 								zero_tolerance=1e-12,
@@ -199,10 +212,21 @@ nmf <- function(Y, L, R,
 	stopifnot(all(Y >= 0))
 	stopifnot(all(L >= 0))
 	stopifnot(all(R >= 0))
+	stopifnot((ncol(L)==nrow(R)) && (nrow(L)==nrow(Y)) && (ncol(R)==ncol(Y)))
 	stopifnot(missing(W_0R) || is.null(W_0R) || all(W_0R >= 0))
 	stopifnot(missing(W_0C) || is.null(W_0C) || all(W_0C >= 0))
+	stopifnot(lambda_1L >= 0)
+	stopifnot(lambda_1R >= 0)
+	stopifnot(lambda_2L >= 0)
+	stopifnot(lambda_2R >= 0)
+	stopifnot(gamma_2L >= 0)
+	stopifnot(gamma_2R >= 0)
 	stopifnot((0 < tau) && (tau < 1))
 	stopifnot((0 <= annealing_rate) && (annealing_rate < 1))
+
+	# precompute
+	W_0R_Y <- (W_0R %**% Y)
+	Y_W_0C <- (Y %**% W_0C)
 
 	tau_k <- tau
 	finished <- FALSE
@@ -212,8 +236,11 @@ nmf <- function(Y, L, R,
 		# update L
 		WRt <- (W_0C %**% t(R))
 		RWR <- R %*% WRt
-		D <- lambda_1L - (W_0R %**% Y) %*% WRt
+		D <- lambda_1L - W_0R_Y %*% WRt
 		F <- (W_0R %**% L) %*% RWR + lambda_2L * L
+		if (gamma_2L > 0) {
+			F <- F + gamma_2L * times_orth(L)
+		}
 		gradfL_k <- D + F
 		H_kp1 <- pick_direction(L, gradfL_k, F)
 		if (check_optimal_step) {
@@ -227,8 +254,11 @@ nmf <- function(Y, L, R,
 		# update R
 		LtW <- t(L) %**% W_0R
 		LWL <- LtW %*% L
-		D <- lambda_1R - LtW %*% (Y %**% W_0C)
+		D <- lambda_1R - LtW %*% Y_W_0C
 		F <- LWL %*% (R %**% W_0C) + lambda_2R * R
+		if (gamma_2R > 0) {
+			F <- F + gamma_2R * times_orth(R)
+		}
 		gradfR_k <- D + F
 		H_kp1 <- pick_direction(R, gradfR_k, F)
 		if (check_optimal_step) {
@@ -387,6 +417,7 @@ gnmf <- function(Y, L, R,
 	stopifnot(all(Y >= 0))
 	stopifnot(all(L >= 0))
 	stopifnot(all(R >= 0))
+	stopifnot((ncol(L)==nrow(R)) && (nrow(L)==nrow(Y)) && (ncol(R)==ncol(Y)))
 	stopifnot(missing(W_0R) || is.null(W_0R) || all(W_0R >= 0))
 	stopifnot(missing(W_0C) || is.null(W_0C) || all(W_0C >= 0))
 	stopifnot(missing(W_1R) || is.null(W_1R) || all(W_1R >= 0))
@@ -410,6 +441,9 @@ gnmf <- function(Y, L, R,
 	}
 	W_2R_J <- length(W_2RR)
 
+	# precompute
+	W_0R_Y <- (W_0R %**% Y)
+	Y_W_0C <- (Y %**% W_0C)
 
 	tau_k <- tau
 	finished <- FALSE
@@ -420,7 +454,7 @@ gnmf <- function(Y, L, R,
 		# update L
 		WRt <- (W_0C %**% t(R))
 		RWR <- R %*% WRt
-		D <- W_1L - (W_0R %**% Y) %*% WRt
+		D <- W_1L - W_0R_Y %*% WRt
 		F <- (W_0R %**% L) %*% RWR 
 		for (jidx in 1:W_2L_J) {
 			F <- F + W_2RL[[jidx]] %**% L %**% W_2CL[[jidx]]
@@ -442,7 +476,7 @@ gnmf <- function(Y, L, R,
 		# update R
 		LtW <- t(L) %**% W_0R
 		LWL <- LtW %*% L
-		D <- W_1R - LtW %*% (Y %**% W_0C)
+		D <- W_1R - LtW %*% Y_W_0C
 		F <- LWL %*% (R %**% W_0C) 
 		for (jidx in 1:W_2R_J) {
 			F <- F + W_2RR[[jidx]] %**% R %**% W_2CR[[jidx]]

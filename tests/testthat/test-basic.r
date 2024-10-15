@@ -84,13 +84,47 @@ test_that("nmf runs",{#FOLDUP
 
 	L_0 <- randmat(nr,dm)
 	R_0 <- randmat(dm,nc)
-	expect_error(out1 <- nmf(Y, L_0, R_0, max_iterations=5e3L,check_optimal_step=FALSE),NA)
+	for (check_optimal_step in c(TRUE, FALSE)) {
+		expect_error(out1 <- nmf(Y, L_0, R_0, max_iterations=5e3L,check_optimal_step=check_optimal_step),NA)
+
+		# with L1 regularization on one side
+		expect_error(out2 <- nmf(Y, L_0, R_0, max_iterations=5e3L,lambda_1L=0.1,check_optimal_step=check_optimal_step),NA)
+
+		# with L1 regularization on both sides
+		expect_error(out3 <- nmf(Y, L_0, R_0, max_iterations=5e3L,lambda_1L=0.1,lambda_1R=0.1,check_optimal_step=check_optimal_step),NA)
+
+		# with non-orthogonality penalty
+		expect_error(out4 <- nmf(Y, L_0, R_0, max_iterations=5e3L,lambda_1L=0.1,lambda_1R=0.1,gamma_2L=0.1,gamma_2R=0.1,check_optimal_step=check_optimal_step),NA)
+	}
+
+})#UNFOLD
+#UNFOLD
+context("test murnmf")#FOLDUP
+test_that("murnmf runs",{#FOLDUP
+	nr <- 100
+	nc <- 20
+	dm <- 4
+
+	set.seed(1234)
+	real_L <- randmat(nr,dm)
+	real_R <- randmat(dm,nc)
+	Y <- real_L %*% real_R
+	# without regularization
+	objective <- function(Y, L, R) { sum((Y - L %*% R)^2) }
+
+	L_0 <- randmat(nr,dm)
+	R_0 <- randmat(dm,nc)
+	expect_error(out1 <- murnmf(Y, L_0, R_0, max_iterations=5e3L),NA)
 
 	# with L1 regularization on one side
-	expect_error(out2 <- nmf(Y, L_0, R_0, max_iterations=5e3L,lambda_1L=0.1,check_optimal_step=FALSE),NA)
+	expect_error(out2 <- murnmf(Y, L_0, R_0, max_iterations=5e3L,lambda_1L=0.1),NA)
 
 	# with L1 regularization on both sides
-	expect_error(out3 <- nmf(Y, L_0, R_0, max_iterations=5e3L,lambda_1L=0.1,lambda_1R=0.1,check_optimal_step=FALSE),NA)
+	expect_error(out3 <- murnmf(Y, L_0, R_0, max_iterations=5e3L,lambda_1L=0.1,lambda_1R=0.1),NA)
+
+	# with non-orthogonality penalty
+	expect_error(out4 <- murnmf(Y, L_0, R_0, max_iterations=5e3L,lambda_1L=0.1,lambda_1R=0.1,gamma_2L=0.1,gamma_2R=0.1),NA)
+
 })#UNFOLD
 #UNFOLD
 context("test gnmf")#FOLDUP

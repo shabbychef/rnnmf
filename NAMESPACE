@@ -2,4 +2,5 @@
 
 export(giqpm)
 export(gnmf)
+export(murnmf)
 export(nmf)
