@@ -22,6 +22,7 @@ gaurnmf(
   zero_tolerance = 1e-12,
   max_iterations = 1000L,
   min_xstep = 1e-09,
+  on_iteration_end = NULL,
   verbosity = 0
 )
 }
@@ -93,6 +94,10 @@ of convergence.}
 
 \item{min_xstep}{the minimum L-infinity norm of the step taken.
 Once the step falls under this value, we terminate.}
+
+\item{on_iteration_end}{an optional function that is called at the end of
+each iteration. The function is called as 
+\code{on_iteration_end(iteration=iteration, Y=Y, L=L, R=R, Lstep=Lstep, Rstep=Rstep, ...)}}
 
 \item{verbosity}{controls whether we print information to the console.}
 }

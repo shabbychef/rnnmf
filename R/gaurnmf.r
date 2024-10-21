@@ -153,6 +153,7 @@ gaurnmf <- function(Y, L, R,
 										zero_tolerance=1e-12,
 										max_iterations=1e3L, 
 										min_xstep=1e-9,
+										on_iteration_end=NULL,
 										verbosity=0) {
 	stopifnot(all(Y >= 0))
 	stopifnot(all(L >= 0))
@@ -239,6 +240,9 @@ gaurnmf <- function(Y, L, R,
 		k <- k + 1
 		converged <- (max(c(Lstep,Rstep)) < min_xstep)
 		finished <- converged || (k >= max_iterations) 
+		if (! is.null(on_iteration_end)) {
+			on_iteration_end(iteration=k, Y=Y, L=L, R=R, Lstep=Lstep, Rstep=Rstep, converged=converged, finished=finished)
+		}
 	}
 	if (verbosity > 1) { 
 		print(paste0("terminated after ",k," iterations. converged: ",converged))

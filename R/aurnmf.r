@@ -145,14 +145,17 @@ times_orth <- function(M) {
 #' Defaults to zero.
 #' @param gamma_2R  the scalar \eqn{\ell_2} penalty for non-orthogonality of the matrix \eqn{R}.
 #' Defaults to zero.
+#' @param on_iteration_end  an optional function that is called at the end of
+#' each iteration. The function is called as 
+#' \code{on_iteration_end(iteration=iteration, Y=Y, L=L, R=R, Lstep=Lstep, Rstep=Rstep, ...)}
 #'
 #' @inheritParams giqpm
 #' @return a list with the elements
 #' \describe{
 #' \item{L}{The final estimate of L.}
 #' \item{R}{The final estimate of R.}
-#' \item{Lstep}{The infinity norm of the final step in L}.
-#' \item{Rstep}{The infinity norm of the final step in R}.
+#' \item{Lstep}{The infinity norm of the final step in L.}
+#' \item{Rstep}{The infinity norm of the final step in R.}
 #' \item{iterations}{The number of iterations taken.}
 #' \item{converged}{Whether convergence was detected.}
 #' }
@@ -208,6 +211,7 @@ aurnmf <- function(Y, L, R,
 									 zero_tolerance=1e-12,
 									 max_iterations=1e3L, 
 									 min_xstep=1e-9,
+									 on_iteration_end=NULL,
 									 verbosity=0) {
 	stopifnot(all(Y >= 0))
 	stopifnot(all(L >= 0))
@@ -274,6 +278,9 @@ aurnmf <- function(Y, L, R,
 		k <- k + 1
 		converged <- (max(c(Lstep,Rstep)) < min_xstep)
 		finished <- converged || (k >= max_iterations) 
+		if (! is.null(on_iteration_end)) {
+			on_iteration_end(iteration=k, Y=Y, L=L, R=R, Lstep=Lstep, Rstep=Rstep, converged=converged, finished=finished)
+		}
 	}
 	if (verbosity > 1) { 
 		print(paste0("terminated after ",k," iterations. converged: ",converged))

@@ -19,6 +19,7 @@ murnmf(
   epsilon = 1e-07,
   max_iterations = 1000L,
   min_xstep = 1e-09,
+  on_iteration_end = NULL,
   verbosity = 0
 )
 }
@@ -65,6 +66,10 @@ Defaults to zero.}
 \item{min_xstep}{the minimum L-infinity norm of the step taken.
 Once the step falls under this value, we terminate.}
 
+\item{on_iteration_end}{an optional function that is called at the end of
+each iteration. The function is called as 
+\code{on_iteration_end(iteration=iteration, Y=Y, L=L, R=R, Lstep=Lstep, Rstep=Rstep, ...)}}
+
 \item{verbosity}{controls whether we print information to the console.}
 }
 \value{
@@ -72,8 +77,8 @@ a list with the elements
 \describe{
 \item{L}{The final estimate of L.}
 \item{R}{The final estimate of R.}
-\item{Lstep}{The infinity norm of the final step in L}.
-\item{Rstep}{The infinity norm of the final step in R}.
+\item{Lstep}{The infinity norm of the final step in L.}
+\item{Rstep}{The infinity norm of the final step in R.}
 \item{iterations}{The number of iterations taken.}
 \item{converged}{Whether convergence was detected.}
 }
