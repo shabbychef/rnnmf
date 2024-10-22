@@ -34,6 +34,8 @@ randmat <- function(nr,nc,zero_p=0.2) { matrix(pmax(0,runif(nr*nc)-zero_p),nrow=
 
 # just test if everything runs...
 
+quadratic_objective <- function(Y, L, R) { sum((Y - L %*% R)^2) }
+
 context("test giqpm")#FOLDUP
 test_that("giqpm runs",{#FOLDUP
 	set.seed(1234)
@@ -79,12 +81,10 @@ test_that("aurnmf runs",{#FOLDUP
 	real_L <- randmat(nr,dm)
 	real_R <- randmat(dm,nc)
 	Y <- real_L %*% real_R
-	# without regularization
-	objective <- function(Y, L, R) { sum((Y - L %*% R)^2) }
-
 	L_0 <- randmat(nr,dm)
 	R_0 <- randmat(dm,nc)
 	for (check_optimal_step in c(TRUE, FALSE)) {
+		# without regularization
 		expect_error(out1 <- aurnmf(Y, L_0, R_0, max_iterations=5e3L,check_optimal_step=check_optimal_step),NA)
 
 		# with L1 regularization on one side
@@ -97,6 +97,43 @@ test_that("aurnmf runs",{#FOLDUP
 		expect_error(out4 <- aurnmf(Y, L_0, R_0, max_iterations=5e3L,lambda_1L=0.1,lambda_1R=0.1,gamma_2L=0.1,gamma_2R=0.1,check_optimal_step=check_optimal_step),NA)
 	}
 
+})#UNFOLD
+test_that("aurnmf callbacks",{#FOLDUP
+	nr <- 100
+	nc <- 20
+	dm <- 4
+
+	set.seed(1234)
+	real_L <- randmat(nr,dm)
+	real_R <- randmat(dm,nc)
+	Y <- real_L %*% real_R
+
+	max_iterations <- 5e3L
+	it_history <<- rep(NA_real_, max_iterations)
+	on_iteration_end <- function(iteration, Y, L, R, ...) {
+		it_history[iteration] <<- quadratic_objective(Y,L,R)
+	}
+	L_0 <- randmat(nr,dm)
+	R_0 <- randmat(dm,nc)
+	expect_error(out1 <- aurnmf(Y, L_0, R_0, max_iterations=5e3L, on_iteration_end=on_iteration_end),NA)
+
+})#UNFOLD
+test_that("aurnmf is good",{#FOLDUP
+	nr <- 100
+	nc <- 10
+	dm <- 2
+
+	set.seed(5678)
+	real_L <- randmat(nr,dm)
+	real_R <- randmat(dm,nc)
+	Y <- real_L %*% real_R
+	L_0 <- randmat(nr,dm)
+	R_0 <- randmat(dm,nc)
+	for (check_optimal_step in c(TRUE, FALSE)) {
+		# without regularization
+		expect_error(out1 <- aurnmf(Y, L_0, R_0, max_iterations=5e3L,check_optimal_step=check_optimal_step),NA)
+		expect_lt(quadratic_objective(Y, out1$L, out1$R), quadratic_objective(Y, L_0, R_0))
+	}
 })#UNFOLD
 #UNFOLD
 context("test murnmf")#FOLDUP
@@ -126,6 +163,22 @@ test_that("murnmf runs",{#FOLDUP
 	expect_error(out4 <- murnmf(Y, L_0, R_0, max_iterations=5e3L,lambda_1L=0.1,lambda_1R=0.1,gamma_2L=0.1,gamma_2R=0.1),NA)
 
 })#UNFOLD
+test_that("murnmf is good",{#FOLDUP
+	nr <- 100
+	nc <- 10
+	dm <- 2
+
+	set.seed(5678)
+	real_L <- randmat(nr,dm)
+	real_R <- randmat(dm,nc)
+	Y <- real_L %*% real_R
+	L_0 <- randmat(nr,dm)
+	R_0 <- randmat(dm,nc)
+	# without regularization
+	out1 <- murnmf(Y, L_0, R_0, max_iterations=5e3L)
+	expect_error(out1 <- murnmf(Y, L_0, R_0, max_iterations=5e3L),NA)
+	expect_lt(quadratic_objective(Y, out1$L, out1$R), quadratic_objective(Y, L_0, R_0))
+})#UNFOLD
 #UNFOLD
 context("test gaurnmf")#FOLDUP
 test_that("gaurnmf runs",{#FOLDUP
@@ -137,11 +190,9 @@ test_that("gaurnmf runs",{#FOLDUP
 	real_L <- randmat(nr,dm)
 	real_R <- randmat(dm,nc)
 	Y <- real_L %*% real_R
-	# without regularization
-	objective <- function(Y, L, R) { sum((Y - L %*% R)^2) }
-
 	L_0 <- randmat(nr,dm)
 	R_0 <- randmat(dm,nc)
+	# without regularization
 	expect_error(out1 <- gaurnmf(Y, L_0, R_0, max_iterations=5e3L,check_optimal_step=FALSE),NA)
 
 	# with L1 regularizations
@@ -175,6 +226,23 @@ test_that("gaurnmf runs",{#FOLDUP
 														W_2RL=list(W_2RL1,W_2RL2),W_2CL=list(W_2CL1,W_2CL2),W_2RR=list(W_2RR,0.2),W_2CR=list(W_2CR,0.2),
 														max_iterations=5e2L,check_optimal_step=FALSE),NA)
 
+})#UNFOLD
+test_that("gaurnmf is good",{#FOLDUP
+	nr <- 100
+	nc <- 10
+	dm <- 2
+
+	set.seed(5678)
+	real_L <- randmat(nr,dm)
+	real_R <- randmat(dm,nc)
+	Y <- real_L %*% real_R
+	L_0 <- randmat(nr,dm)
+	R_0 <- randmat(dm,nc)
+	for (check_optimal_step in c(TRUE, FALSE)) {
+		# without regularization
+		expect_error(out1 <- gaurnmf(Y, L_0, R_0, max_iterations=5e3L,check_optimal_step=check_optimal_step),NA)
+		expect_lt(quadratic_objective(Y, out1$L, out1$R), quadratic_objective(Y, L_0, R_0))
+	}
 })#UNFOLD
 #UNFOLD
 
