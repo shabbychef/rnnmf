@@ -119,7 +119,8 @@ murnmf <- function(Y, L, R,
 			F <- F + gamma_2L * times_orth(L)
 		}
 		Lprev <- L
-		L <- -L * (H / F)
+		Fok <- (F > 0) & ! is.nan(F)
+		L[Fok] <- -L[Fok] * (H[Fok] / F[Fok])
 		Lstep <- max(abs(L - Lprev))
 		# update R
 		LtW <- t(L) %**% W_0R
@@ -131,12 +132,13 @@ murnmf <- function(Y, L, R,
 			F <- F + gamma_2R * times_orth(R)
 		}
 		Rprev <- R
-		R <- -R * (H / F)
+		Fok <- (F > 0) & ! is.nan(F)
+		R[Fok] <- -R[Fok] * (H[Fok] / F[Fok])
 		Rstep <- max(abs(R - Rprev))
 		
 		k <- k + 1
 		converged <- (max(c(Lstep,Rstep)) < min_xstep)
-		finished <- converged || (k >= max_iterations) 
+		finished <- converged || (k >= max_iterations) || all(!Fok)
 		if (! is.null(on_iteration_end)) {
 			on_iteration_end(iteration=k, Y=Y, L=L, R=R, Lstep=Lstep, Rstep=Rstep, converged=converged, finished=finished)
 		}
