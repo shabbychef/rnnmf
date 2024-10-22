@@ -155,6 +155,15 @@ sum(out2$L)
  objective(Y,out3$L,out3$R)
 list(L1=sum(out1$L),R1=sum(out1$R),L3=sum(out3$L),R3=sum(out3$R))
 
+# example showing how to use the on_iteration_end callback to save iterates.
+max_iterations <- 5e3L
+it_history <<- rep(NA_real_, max_iterations)
+quadratic_objective <- function(Y, L, R) { sum((Y - L \%*\% R)^2) }
+on_iteration_end <- function(iteration, Y, L, R, ...) {
+  it_history[iteration] <<- quadratic_objective(Y,L,R)
+}
+out1b <- aurnmf(Y, L_0, R_0, max_iterations=max_iterations, on_iteration_end=on_iteration_end)
+
 }
 \references{
 Merritt, Michael, and Zhang, Yin. "Interior-point Gradient Method for Large-Scale Totally 
