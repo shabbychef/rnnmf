@@ -94,8 +94,8 @@ test_a_bunch(Y_t, L_0, R_0, niter = 10000L) %>%
 ```
 
 <div class="figure">
-<img src="tools/figure/under_null_pvals-1.png" alt="plot of chunk under_null_pvals" width="600px" height="500px" />
-<p class="caption">plot of chunk under_null_pvals</p>
+<img src="tools/figure/basic_simulations-1.png" alt="plot of chunk basic_simulations" width="600px" height="500px" />
+<p class="caption">plot of chunk basic_simulations</p>
 </div>
 
 

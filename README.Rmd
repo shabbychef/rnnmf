@@ -1,4 +1,29 @@
 ```{r setup,include=FALSE}
+library(ggplot2)
+
+theme_set(theme_minimal(base_size=12))
+theme_update(legend.position="bottom")
+
+if (require(viridis,quietly=TRUE)) {
+  scale_colour_discrete <- function(...) {
+    require(viridis,quietly=TRUE)
+    scale_color_viridis(discrete=TRUE,end=0.85,option='D',...)
+  }
+  scale_fill_discrete <- function(...) {
+    require(viridis,quietly=TRUE)
+    scale_fill_viridis(discrete=TRUE,end=0.85,option='D',...)
+  }
+  # wait, can I also default for continuous cases?
+  scale_colour_continuous <- function(...) {
+    require(viridis,quietly=TRUE)
+    scale_color_viridis(discrete=FALSE,end=0.85,option='D',...)
+  }
+  scale_fill_continuous <- function(...) {
+    require(viridis,quietly=TRUE)
+    scale_fill_viridis(discrete=FALSE,end=0.85,option='D',...)
+  }
+}
+
 # set the knitr options ... for everyone!
 # if you unset this, then vignette build bonks. oh, joy.
 #opts_knit$set(progress=TRUE)
@@ -75,7 +100,7 @@ are uniform. We draw a normal vector with identity covariance and zero mean,
 then flip the sign of each element to make them positive. We then
 perform inference on the sum of the mean values. 
 
-```{r under_null_pvals,cache=TRUE,eval=TRUE,echo=TRUE,dpi=200,out.width='600px',out.height='500px'}
+```{r basic_simulations,cache=TRUE,eval=TRUE,echo=TRUE,dpi=200,out.width='600px',out.height='500px'}
 library(dplyr)
 library(rnmf)
 library(ggplot2)
@@ -124,6 +149,7 @@ test_a_bunch(Y_t, L_0, R_0, niter=1e4L) %>%
 	labs(x='Step',y=expression(L[2]~~Error),
 			 title=' Error vs Step',color='Method',
 			 caption=paste0('Factoring ',nr,' x ',nc,' matrix down to ',nd,' dimensions.'))
+
 
 ```
 
