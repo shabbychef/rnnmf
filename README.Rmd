@@ -95,18 +95,17 @@ if (require(drat)) {
 
 # Basic Usage
 
-First we perform some simulations under the null to show that the p-values
-are uniform. We draw a normal vector with identity covariance and zero mean,
-then flip the sign of each element to make them positive. We then
-perform inference on the sum of the mean values. 
+We demonstrate the usage of the multiplicative and additive updates in
+factoring a small matrix which we constructed to be the product of two
+reduced rank non-negative matrices.
 
 ```{r basic_simulations,cache=TRUE,eval=TRUE,echo=TRUE,dpi=200,out.width='600px',out.height='500px'}
 library(dplyr)
 library(rnmf)
 library(ggplot2)
 
-ferr <- function(Y, L, R) {
-	sum(abs(Y - L %*% R)^2)
+frobenius_norm_err <- function(Y, L, R) {
+	sqrt(sum(abs(Y - L %*% R)^2))
 }
 runifmat <- function(nr,nc,...) {
 	matrix(pmax(0,runif(nr*nc,...)),nrow=nr)
@@ -114,7 +113,7 @@ runifmat <- function(nr,nc,...) {
 test_a_bunch <- function(Y_t, L_0, R_0, niter=1e4L) {
 	history <<- rep(NA_real_, niter)
 	on_iteration_end <- function(iteration, Y, L, R, ...) {
-		history[iteration] <<- ferr(Y,L,R)
+		history[iteration] <<- frobenius_norm_err(Y,L,R)
 	}
 	wuz <- aurnmf(Y_t, L_0, R_0, max_iterations=length(history), on_iteration_end=on_iteration_end)
 	df1 <- tibble(x=seq_along(history),y=history) %>% mutate(method='additive, optimal step')
@@ -147,7 +146,7 @@ test_a_bunch(Y_t, L_0, R_0, niter=1e4L) %>%
 	geom_line() + 
 	scale_x_log10(labels=scales::comma) + scale_y_log10() +
 	labs(x='Step',y=expression(L[2]~~Error),
-			 title=' Error vs Step',color='Method',
+			 title='Frobenius Norm of Error vs Step',color='Method',
 			 caption=paste0('Factoring ',nr,' x ',nc,' matrix down to ',nd,' dimensions.'))
 
 

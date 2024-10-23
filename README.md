@@ -33,10 +33,9 @@ if (require(drat)) {
 
 # Basic Usage
 
-First we perform some simulations under the null to show that the p-values
-are uniform. We draw a normal vector with identity covariance and zero mean,
-then flip the sign of each element to make them positive. We then
-perform inference on the sum of the mean values. 
+We demonstrate the usage of the multiplicative and additive updates in
+factoring a small matrix which we constructed to be the product of two
+reduced rank non-negative matrices.
 
 
 ``` r
@@ -44,8 +43,8 @@ library(dplyr)
 library(rnmf)
 library(ggplot2)
 
-ferr <- function(Y, L, R) {
-    sum(abs(Y - L %*% R)^2)
+frobenius_norm_err <- function(Y, L, R) {
+    sqrt(sum(abs(Y - L %*% R)^2))
 }
 runifmat <- function(nr, nc, ...) {
     matrix(pmax(0, runif(nr * nc, ...)), nrow = nr)
@@ -54,7 +53,8 @@ test_a_bunch <- function(Y_t, L_0, R_0, niter = 10000L) {
     history <<- rep(NA_real_, niter)
     on_iteration_end <- function(iteration, Y, L, R,
         ...) {
-        history[iteration] <<- ferr(Y, L, R)
+        history[iteration] <<- frobenius_norm_err(Y,
+            L, R)
     }
     wuz <- aurnmf(Y_t, L_0, R_0, max_iterations = length(history),
         on_iteration_end = on_iteration_end)
@@ -88,9 +88,10 @@ test_a_bunch(Y_t, L_0, R_0, niter = 10000L) %>%
     ggplot(aes(x, y, color = method)) + geom_line() +
     scale_x_log10(labels = scales::comma) + scale_y_log10() +
     labs(x = "Step", y = expression(L[2] ~ ~Error),
-        title = " Error vs Step", color = "Method",
-        caption = paste0("Factoring ", nr, " x ", nc,
-            " matrix down to ", nd, " dimensions."))
+        title = "Frobenius Norm of Error vs Step",
+        color = "Method", caption = paste0("Factoring ",
+            nr, " x ", nc, " matrix down to ", nd,
+            " dimensions."))
 ```
 
 <div class="figure">
