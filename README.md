@@ -12,7 +12,7 @@ Lee & Seung, "Algorithms for Non-negative Matrix Factorization," 2001.
 ## Installation
 
 This package may be installed from CRAN; the latest version may be
-found on [github](https://www.github.com/shabbychef/rnmf "rnmf")
+found on [github](https://github.com/shabbychef/rnmf "rnmf")
 via devtools, or installed via [drat](https://github.com/eddelbuettel/drat "drat"):
 
 

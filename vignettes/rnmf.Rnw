@@ -1189,7 +1189,7 @@ bind_rows(test2 %>% mutate(starting_iterate='sparse'),
 %\bibliographystyle{ieeetr}
 \bibliographystyle{plainnat}
 %\bibliographystyle{acm}
-\bibliography{common,rauto}
+\bibliography{rnmf}
 %\bibliography{AsymptoticMarkowitz}
 %UNFOLD
 

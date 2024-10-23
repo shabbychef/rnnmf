@@ -11,7 +11,7 @@ Authors@R: c(person(c("Steven", "E."), "Pav",
 Version: VERSION()
 Date: DATE()
 License: LGPL-3
-Title: Regularized Non-negative Matrix Factorization
+Title: Regularized Non-Negative Matrix Factorization
 BugReports: https://github.com/shabbychef/PKG_NAME()/issues
 Description: A proof of concept implementation of regularized non-negative matrix factorization optimization.
 Depends: 
