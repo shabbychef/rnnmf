@@ -13,15 +13,16 @@ Date: DATE()
 License: LGPL-3
 Title: Regularized Non-negative Matrix Factorization
 BugReports: https://github.com/shabbychef/PKG_NAME()/issues
-Description: a proof of concept implementation of regularized non-negative matrix factorization optimization.
+Description: A proof of concept implementation of regularized non-negative matrix factorization optimization.
 Depends: 
     R (>= 3.0.2)
-Imports:
-    matrixcalc
+dnl Imports:
 dnl LinkingTo: Rcpp
 Suggests: 
     testthat, 
-    cocktailApp,
+    ggplot2,
+    viridis,
+dnl cocktailApp,
     knitr
 URL: https://github.com/shabbychef/PKG_NAME()
 VignetteBuilder: knitr

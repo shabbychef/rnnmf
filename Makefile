@@ -8,7 +8,7 @@
 ############### FLAGS ###############
 
 VMAJOR 						 = 0
-VMINOR 						 = 2
+VMINOR 						 = 3
 VPATCH  					 = 0
 # VDEV 							 = .9001
 VDEV 							 = 
