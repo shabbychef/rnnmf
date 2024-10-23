@@ -14,7 +14,9 @@ Depends:
     R (>= 3.0.2)
 Suggests: 
     testthat, 
+    dplyr,
     ggplot2,
+    scales,
     viridis,
     knitr
 URL: https://github.com/shabbychef/rnmf
@@ -25,3 +27,4 @@ Collate:
     'giqpm.r'
     'murnmf.r'
     'rnmf-package.r'
+RoxygenNote: 7.3.2

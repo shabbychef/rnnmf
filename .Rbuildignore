@@ -19,7 +19,6 @@ man-roxygen
 ^rnmf.Rcheck$
 ^rnmf$
 rnmf/libs
-rnmf.pdf
 ^github_extra
 unit_test.log
 LICENSE
@@ -42,8 +41,9 @@ Rd2.pdf
 submodule_directions.sh
 ^data-raw$
 rpkg_make
-rpkg_make
 .Rhistory
 .RData
 ^doc$
 ^Meta$
+^.R$
+^\.github$

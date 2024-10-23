@@ -141,16 +141,17 @@ all risk.
  L_0 <- randmat(nr,dm)
  R_0 <- randmat(dm,nc)
  objective(Y,L_0,R_0)
- out1 <- aurnmf(Y, L_0, R_0, max_iterations=5e4L,check_optimal_step=FALSE)
+ out1 <- aurnmf(Y, L_0, R_0, max_iterations=5e3L,check_optimal_step=FALSE)
  objective(Y,out1$L,out1$R)
 # with L1 regularization on one side
- out2 <- aurnmf(Y, L_0, R_0, max_iterations=5e4L,lambda_1L=0.1,check_optimal_step=FALSE)
+ out2 <- aurnmf(Y, L_0, R_0, lambda_1L=0.1, max_iterations=5e3L,check_optimal_step=FALSE)
 # objective does not suffer because all mass is shifted to R
  objective(Y,out2$L,out2$R)
 list(L1=sum(out1$L),R1=sum(out1$R),L2=sum(out2$L),R2=sum(out2$R))
 sum(out2$L)
 # with L1 regularization on both sides
- out3 <- aurnmf(Y, L_0, R_0, max_iterations=5e4L,lambda_1L=0.1,lambda_1R=0.1,check_optimal_step=FALSE)
+ out3 <- aurnmf(Y, L_0, R_0, lambda_1L=0.1,lambda_1R=0.1,
+     max_iterations=5e3L,check_optimal_step=FALSE)
 # with L1 regularization on both sides, raw objective suffers
  objective(Y,out3$L,out3$R)
 list(L1=sum(out1$L),R1=sum(out1$R),L3=sum(out3$L),R3=sum(out3$R))

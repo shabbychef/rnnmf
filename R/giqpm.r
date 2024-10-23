@@ -153,6 +153,7 @@ default_stepfunc <- lee_seung_stepfunc
 #' objective(G, d, y4$x)
 #' objective(G, d, y5$x)
 #'
+#' @importFrom stats runif
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @export
 giqpm <- function(Gmat, dvec, x0=NULL, 

@@ -163,24 +163,28 @@ all risk.
  L_0 <- randmat(nr,dm)
  R_0 <- randmat(dm,nc)
  wt_objective(Y,L_0,R_0,W_0R,W_0C)
- out1 <- gaurnmf(Y, L_0, R_0, W_0R=W_0R, W_0C=W_0C, max_iterations=1e5L,check_optimal_step=FALSE)
+ out1 <- gaurnmf(Y, L_0, R_0, W_0R=W_0R, W_0C=W_0C, 
+         max_iterations=1e4L,check_optimal_step=FALSE)
  wt_objective(Y,out1$L,out1$R,W_0R,W_0C)
  
  W_1L <- randmat(nr,dm)
- out2 <- gaurnmf(Y, out1$L, out1$R, W_0R=W_0R, W_0C=W_0C, W_1L=W_1L, max_iterations=1e5L,check_optimal_step=FALSE)
+ out2 <- gaurnmf(Y, out1$L, out1$R, W_0R=W_0R, W_0C=W_0C, W_1L=W_1L, 
+         max_iterations=1e4L,check_optimal_step=FALSE)
  wt_objective(Y,out2$L,out2$R,W_0R,W_0C)
  
  W_1R <- randmat(dm,nc)
- out3 <- gaurnmf(Y, out2$L, out2$R, W_0R=W_0R, W_0C=W_0C, W_1R=W_1R, max_iterations=1e5L,check_optimal_step=FALSE)
+ out3 <- gaurnmf(Y, out2$L, out2$R, W_0R=W_0R, W_0C=W_0C, W_1R=W_1R, 
+         max_iterations=1e4L,check_optimal_step=FALSE)
  wt_objective(Y,out3$L,out3$R,W_0R,W_0C)
 
 # example showing how to use the on_iteration_end callback to save iterates.
- max_iterations <- 5e3L
+ max_iterations <- 1e3L
  it_history <<- rep(NA_real_, max_iterations)
  on_iteration_end <- function(iteration, Y, L, R, ...) {
    it_history[iteration] <<- wt_objective(Y,L,R,W_0R,W_0C)
  }
- out1b <- gaurnmf(Y, L_0, R_0, W_0R=W_0R, W_0C=W_0C, max_iterations=max_iterations, on_iteration_end=on_iteration_end, check_optimal_step=FALSE)
+ out1b <- gaurnmf(Y, L_0, R_0, W_0R=W_0R, W_0C=W_0C, 
+   max_iterations=max_iterations, on_iteration_end=on_iteration_end, check_optimal_step=FALSE)
 
 }
 \references{

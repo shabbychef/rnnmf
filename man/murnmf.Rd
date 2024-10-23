@@ -115,22 +115,22 @@ all risk.
  L_0 <- randmat(nr,dm)
  R_0 <- randmat(dm,nc)
  objective(Y,L_0,R_0)
- out1 <- murnmf(Y, L_0, R_0, max_iterations=5e4L)
+ out1 <- murnmf(Y, L_0, R_0, max_iterations=5e3L)
  objective(Y,out1$L,out1$R)
 # with L1 regularization on one side
- out2 <- murnmf(Y, L_0, R_0, max_iterations=5e4L,lambda_1L=0.1)
+ out2 <- murnmf(Y, L_0, R_0, max_iterations=5e3L,lambda_1L=0.1)
 # objective does not suffer because all mass is shifted to R
  objective(Y,out2$L,out2$R)
 list(L1=sum(out1$L),R1=sum(out1$R),L2=sum(out2$L),R2=sum(out2$R))
 sum(out2$L)
 # with L1 regularization on both sides
- out3 <- murnmf(Y, L_0, R_0, max_iterations=5e4L,lambda_1L=0.1,lambda_1R=0.1)
+ out3 <- murnmf(Y, L_0, R_0, max_iterations=5e3L,lambda_1L=0.1,lambda_1R=0.1)
 # with L1 regularization on both sides, raw objective suffers
  objective(Y,out3$L,out3$R)
 list(L1=sum(out1$L),R1=sum(out1$R),L3=sum(out3$L),R3=sum(out3$R))
 
 # example showing how to use the on_iteration_end callback to save iterates.
-max_iterations <- 5e3L
+max_iterations <- 1e3L
 it_history <<- rep(NA_real_, max_iterations)
 quadratic_objective <- function(Y, L, R) { sum((Y - L \%*\% R)^2) }
 on_iteration_end <- function(iteration, Y, L, R, ...) {

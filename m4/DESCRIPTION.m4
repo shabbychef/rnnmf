@@ -20,7 +20,9 @@ dnl Imports:
 dnl LinkingTo: Rcpp
 Suggests: 
     testthat, 
+    dplyr,
     ggplot2,
+    scales,
     viridis,
 dnl cocktailApp,
     knitr
