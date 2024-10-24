@@ -53,17 +53,17 @@ options(width=64,digits=2)
 opts_chunk$set(size="small")
 opts_chunk$set(tidy=TRUE,tidy.opts=list(width.cutoff=50,keep.blank.line=TRUE))
 
-#rnmf.meta <- packageDescription('rnmf')
+#rnnmf.meta <- packageDescription('rnnmf')
 ```
 
-# rnmf
+# rnnmf
 
 ```{r ignore,include=FALSE,eval=FALSE}
-# [![Build Status](https://github.com/shabbychef/rnmf/workflows/R-CMD-check/badge.svg)](https://github.com/shabbychef/rnmf/actions)
-# [![codecov.io](http://codecov.io/github/shabbychef/rnmf/coverage.svg?branch=master)](http://codecov.io/github/shabbychef/rnmf?branch=master)
-# [![CRAN](http://www.r-pkg.org/badges/version/rnmf)](https://cran.r-project.org/package=rnmf)
-# [![Downloads](http://cranlogs.r-pkg.org/badges/rnmf?color=green)](http://www.r-pkg.org/pkg/rnmf)
-# [![Total](http://cranlogs.r-pkg.org/badges/grand-total/rnmf?color=green)](http://www.r-pkg.org/pkg/rnmf)
+# [![Build Status](https://github.com/shabbychef/rnnmf/workflows/R-CMD-check/badge.svg)](https://github.com/shabbychef/rnnmf/actions)
+# [![codecov.io](http://codecov.io/github/shabbychef/rnnmf/coverage.svg?branch=master)](http://codecov.io/github/shabbychef/rnnmf?branch=master)
+# [![CRAN](http://www.r-pkg.org/badges/version/rnnmf)](https://cran.r-project.org/package=rnnmf)
+# [![Downloads](http://cranlogs.r-pkg.org/badges/rnnmf?color=green)](http://www.r-pkg.org/pkg/rnnmf)
+# [![Total](http://cranlogs.r-pkg.org/badges/grand-total/rnnmf?color=green)](http://www.r-pkg.org/pkg/rnnmf)
 ```
 
 Implements regularized non-negative matrix factorization by a method similar to 
@@ -74,22 +74,22 @@ Lee & Seung, "Algorithms for Non-negative Matrix Factorization," 2001.
 ## Installation
 
 This package may be installed from CRAN; the latest version may be
-found on [github](https://github.com/shabbychef/rnmf "rnmf")
+found on [github](https://github.com/shabbychef/rnnmf "rnnmf")
 via devtools, or installed via [drat](https://github.com/eddelbuettel/drat "drat"):
 
 ```{r install,eval=FALSE,echo=TRUE}
 # CRAN
-install.packages(c('rnmf'))
+install.packages(c('rnnmf'))
 # devtools
 if (require(devtools)) {
 	# latest greatest
-	install_github('shabbychef/rnmf')
+	install_github('shabbychef/rnnmf')
 }
 # via drat:
 if (require(drat)) {
 	drat:::add('shabbychef')
 	# not yet:
-	# install.packages('rnmf')
+	# install.packages('rnnmf')
 }
 ```
 
@@ -101,7 +101,7 @@ reduced rank non-negative matrices.
 
 ```{r basic_simulations,cache=TRUE,eval=TRUE,echo=TRUE,dpi=200,out.width='600px',out.height='500px'}
 library(dplyr)
-library(rnmf)
+library(rnnmf)
 library(ggplot2)
 
 frobenius_norm_err <- function(Y, L, R) {

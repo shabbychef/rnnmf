@@ -15,10 +15,10 @@ man-roxygen
 ^\.docker_img$
 ^nodist$
 ^rebuildTags.sh
-^rnmf.*.tar.gz$
-^rnmf.Rcheck$
-^rnmf$
-rnmf/libs
+^rnnmf.*.tar.gz$
+^rnnmf.Rcheck$
+^rnnmf$
+rnnmf/libs
 ^github_extra
 unit_test.log
 LICENSE

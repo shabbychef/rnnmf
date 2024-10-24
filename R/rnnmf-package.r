@@ -1,20 +1,20 @@
 # Copyright 2024-2024 Steven E. Pav. All Rights Reserved.
 # Author: Steven E. Pav
 #
-# This file is part of rnmf.
+# This file is part of rnnmf.
 #
-# rnmf is free software: you can redistribute it and/or modify
+# rnnmf is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# rnmf is distributed in the hope that it will be useful,
+# rnnmf is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public License
-# along with rnmf.  If not, see <http://www.gnu.org/licenses/>.
+# along with rnnmf.  If not, see <http://www.gnu.org/licenses/>.
 
 # Created: 2024-08-17
 # Copyright: Steven E. Pav, 2024
@@ -25,7 +25,7 @@
 #' 
 #' @section Legal Mumbo Jumbo:
 #'
-#' rnmf is distributed in the hope that it will be useful,
+#' rnnmf is distributed in the hope that it will be useful,
 #' but WITHOUT ANY WARRANTY; without even the implied warranty of
 #' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #' GNU Lesser General Public License for more details.
@@ -41,8 +41,8 @@
 #' matrix factorization." US Patent 8140272, 2012.
 #' \url{https://patentscope.wipo.int/search/en/detail.jsf?docId=US42758160}
 #'
-#' @name rnmf
-#' @rdname rnmf
+#' @name rnnmf
+#' @rdname rnnmf
 #' @docType package
 #' @title regularized non-negative matrix factorization
 #' @keywords package
@@ -53,21 +53,21 @@
 #'
 "_PACKAGE"
 
-#' @title News for package 'rnmf':
+#' @title News for package 'rnnmf':
 #'
 #' @description 
 #'
-#' News for package \sQuote{rnmf}
+#' News for package \sQuote{rnnmf}
 #'
 #' \newcommand{\CRANpkg}{\href{https://cran.r-project.org/package=#1}{\pkg{#1}}}
-#' \newcommand{\rnmf}{\CRANpkg{rnmf}}
+#' \newcommand{\rnnmf}{\CRANpkg{rnnmf}}
 #'
-#' @section \rnmf{} Initial Version 0.1.0 (2024-08-17) :
+#' @section \rnnmf{} Initial Version 0.3.0 (2024-10-24) :
 #' \itemize{
 #' \item first CRAN release.
 #' }
 #'
-#' @name rnmf-NEWS
+#' @name rnnmf-NEWS
 #' @rdname NEWS
 NULL
 

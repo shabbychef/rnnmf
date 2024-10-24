@@ -2,7 +2,7 @@
 %\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{An Iterative Algorithm for Regularized Non-negative Matrix Factorizations}
 %\VignetteKeyword{Optimization}
-%\VignettePackage{rnmf}
+%\VignettePackage{rnnmf}
 \documentclass[10pt,a4paper,english]{article}
 
 
@@ -1038,7 +1038,7 @@ the $\LMp[k]$ and $\RMp[k]$.
 
 <<'mc_sims',eval=TRUE>>=
 library(dplyr)
-library(rnmf)
+library(rnnmf)
 
 frobenius_err <- function(Y, L, R) {
 	sqrt(sum(abs(Y - L %*% R)^2))
@@ -1113,7 +1113,7 @@ test2b <- test_a_bunch(Y_t, L_0, R_0, niter=1e4L) %>%
 	mutate(true_nd=ynd)
 @
 
-The multiplicative and additive algorithms are implemented in the R package \textsc{rnmf} written by the author.  \cite{rnmfrnmf-Manual}
+The multiplicative and additive algorithms are implemented in the R package \textsc{rnnmf} written by the author.  \cite{rnnmfrnnmf-Manual}
 Here we briefly summarize the results of using the code on generated data.
 We first generate a $\YM$ the exactly equals $\LM\RM$ for some non-negative uniformly random $\LM$ and $\RM$.
 In the first simulations we take $\LM$ to be \bby{\Sexpr{test1$nr[1]}}{\Sexpr{test1$true_nd[1]}}, and $\RM$ to be
@@ -1189,7 +1189,7 @@ bind_rows(test2 %>% mutate(starting_iterate='sparse'),
 %\bibliographystyle{ieeetr}
 \bibliographystyle{plainnat}
 %\bibliographystyle{acm}
-\bibliography{rnmf}
+\bibliography{rnnmf}
 %\bibliography{AsymptoticMarkowitz}
 %UNFOLD
 

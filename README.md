@@ -1,6 +1,6 @@
 
 
-# rnmf
+# rnnmf
 
 
 
@@ -12,22 +12,22 @@ Lee & Seung, "Algorithms for Non-negative Matrix Factorization," 2001.
 ## Installation
 
 This package may be installed from CRAN; the latest version may be
-found on [github](https://github.com/shabbychef/rnmf "rnmf")
+found on [github](https://github.com/shabbychef/rnnmf "rnnmf")
 via devtools, or installed via [drat](https://github.com/eddelbuettel/drat "drat"):
 
 
 ``` r
 # CRAN
-install.packages(c("rnmf"))
+install.packages(c("rnnmf"))
 # devtools
 if (require(devtools)) {
     # latest greatest
-    install_github("shabbychef/rnmf")
+    install_github("shabbychef/rnnmf")
 }
 # via drat:
 if (require(drat)) {
     drat:::add("shabbychef")
-    # not yet: install.packages('rnmf')
+    # not yet: install.packages('rnnmf')
 }
 ```
 
@@ -40,7 +40,7 @@ reduced rank non-negative matrices.
 
 ``` r
 library(dplyr)
-library(rnmf)
+library(rnnmf)
 library(ggplot2)
 
 frobenius_norm_err <- function(Y, L, R) {

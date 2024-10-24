@@ -24,12 +24,12 @@ convoluted_build.sh
 #DESCRIPTION
 #man/
 
-.rnmf*installed
+.rnnmf*installed
 # generated as part of the 'local' vignette build
-rnmf.tex
-rnmf.log
-rnmf/
-./rnmf.pdf
+rnnmf.tex
+rnnmf.log
+rnnmf/
+./rnnmf.pdf
 *.aux
 *.bbl
 *.blg

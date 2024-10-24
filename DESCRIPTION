@@ -1,14 +1,14 @@
-Package: rnmf
+Package: rnnmf
 Maintainer: Steven E. Pav <shabbychef@gmail.com>
 Authors@R: c(person(c("Steven", "E."), "Pav", 
     role=c("aut","cre"),
     email="shabbychef@gmail.com",
     comment = c(ORCID = "0000-0002-4197-6195")))
 Version: 0.3.0
-Date: 2024-10-22
+Date: 2024-10-23
 License: LGPL-3
 Title: Regularized Non-Negative Matrix Factorization
-BugReports: https://github.com/shabbychef/rnmf/issues
+BugReports: https://github.com/shabbychef/rnnmf/issues
 Description: A proof of concept implementation of regularized non-negative matrix factorization optimization.
 Depends: 
     R (>= 3.0.2)
@@ -19,12 +19,12 @@ Suggests:
     scales,
     viridis,
     knitr
-URL: https://github.com/shabbychef/rnmf
+URL: https://github.com/shabbychef/rnnmf
 VignetteBuilder: knitr
 Collate:
     'aurnmf.r'
     'gaurnmf.r'
     'giqpm.r'
     'murnmf.r'
-    'rnmf-package.r'
+    'rnnmf-package.r'
 RoxygenNote: 7.3.2
