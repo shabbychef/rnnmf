@@ -147,7 +147,7 @@ if (require(Matrix)) {
  Y <- as(real_L \%*\% real_R, "sparseMatrix")
  L_0 <- randmat(nr,dm)
  R_0 <- randmat(dm,nc)
- out1 <- murnmf(Y, L_0, R_0, max_iterations=1e2L,check_optimal_step=TRUE)
+ out1 <- murnmf(Y, L_0, R_0, max_iterations=1e2L)
 }
 
 }
