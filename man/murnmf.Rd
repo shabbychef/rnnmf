@@ -141,7 +141,6 @@ out1b <- murnmf(Y, L_0, R_0, max_iterations=max_iterations, on_iteration_end=on_
 }
 
 # should work on sparse matrices too, but beware zeros in the initial estimates
-value
 if (require(Matrix)) { 
  real_L <- randmat(nr,dm,min=-1)
  real_R <- randmat(dm,nc,min=-1)

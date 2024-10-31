@@ -126,16 +126,18 @@ runifmat <- function(nr,nc,...) {
 	matrix(pmax(0,runif(nr*nc,...)),nrow=nr)
 }
 test_a_bunch <- function(Y_t, L_0, R_0, niter=1e4L) {
-	history <<- rep(NA_real_, niter)
-	on_iteration_end <- function(iteration, Y, L, R, ...) {
-		history[iteration] <<- frobenius_norm_err(Y,L,R)
-	}
-	wuz <- aurnmf(Y_t, L_0, R_0, max_iterations=length(history), on_iteration_end=on_iteration_end)
-	df1 <- tibble(x=seq_along(history),y=history) %>% mutate(method='additive, optimal step')
+	iter_hist <- new.env()
+	iter_hist[['history']] <- rep(NA_real_, niter)
 
-	history <<- rep(NA_real_, niter)
-	wuz <- murnmf(Y_t, L_0, R_0, max_iterations=length(history), on_iteration_end=on_iteration_end)
-	df2 <- tibble(x=seq_along(history),y=history) %>% mutate(method='multiplicative')
+	on_iteration_end <- function(iteration, Y, L, R, ...) {
+		iter_hist[['history']][iteration] <<- frobenius_norm_err(Y,L,R)
+	}
+	wuz <- aurnmf(Y_t, L_0, R_0, max_iterations=niter, on_iteration_end=on_iteration_end)
+	df1 <- tibble(x=seq_along(iter_hist[['history']]),y=iter_hist[['history']]) %>% mutate(method='additive, optimal step')
+
+	iter_hist[['history']] <- rep(NA_real_, niter)
+	wuz <- murnmf(Y_t, L_0, R_0, max_iterations=niter, on_iteration_end=on_iteration_end)
+	df2 <- tibble(x=seq_along(iter_hist[['history']]),y=iter_hist[['history']]) %>% mutate(method='multiplicative')
 
 	retv <- bind_rows(df1,df2) %>%
 		mutate(nr=nrow(Y_t),
@@ -170,7 +172,6 @@ test_a_bunch(Y_t, L_0, R_0, niter=1e4L) %>%
 
 ## See also
 
-* The original paper, by Lee, Daniel D. and Seung, H. Sebastian.
-	[Algorithms for Non-negative Matrix Factorization](http://papers.nips.cc/paper/1861-algorithms-for-non-negative-matrix-factorization.pdf), 2001.
+* Lee, Daniel D. and Seung, H. Sebastian. [Algorithms for Non-negative Matrix Factorization](http://papers.nips.cc/paper/1861-algorithms-for-non-negative-matrix-factorization.pdf), 2001.
 * Pav, Steven E. [System and method for unmixing spectroscopic observations with nonnegative matrix factorization](https://patentscope.wipo.int/search/en/detail.jsf?docId=US42758160), 2012.
 

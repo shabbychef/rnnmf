@@ -46,8 +46,6 @@ An additive update based on the same ideas is also given.
 This code is provided mostly for research purposes, and no warranty is given
 regarding speed, or convergence.
 
-
-
 # Basic Usage
 
 We demonstrate the usage of the multiplicative and additive updates in
@@ -67,21 +65,25 @@ runifmat <- function(nr, nc, ...) {
     matrix(pmax(0, runif(nr * nc, ...)), nrow = nr)
 }
 test_a_bunch <- function(Y_t, L_0, R_0, niter = 10000L) {
-    history <<- rep(NA_real_, niter)
+    iter_hist <- new.env()
+    iter_hist[["history"]] <- rep(NA_real_, niter)
+
     on_iteration_end <- function(iteration, Y, L, R,
         ...) {
-        history[iteration] <<- frobenius_norm_err(Y,
+        iter_hist[["history"]][iteration] <<- frobenius_norm_err(Y,
             L, R)
     }
-    wuz <- aurnmf(Y_t, L_0, R_0, max_iterations = length(history),
+    wuz <- aurnmf(Y_t, L_0, R_0, max_iterations = niter,
         on_iteration_end = on_iteration_end)
-    df1 <- tibble(x = seq_along(history), y = history) %>%
+    df1 <- tibble(x = seq_along(iter_hist[["history"]]),
+        y = iter_hist[["history"]]) %>%
         mutate(method = "additive, optimal step")
 
-    history <<- rep(NA_real_, niter)
-    wuz <- murnmf(Y_t, L_0, R_0, max_iterations = length(history),
+    iter_hist[["history"]] <- rep(NA_real_, niter)
+    wuz <- murnmf(Y_t, L_0, R_0, max_iterations = niter,
         on_iteration_end = on_iteration_end)
-    df2 <- tibble(x = seq_along(history), y = history) %>%
+    df2 <- tibble(x = seq_along(iter_hist[["history"]]),
+        y = iter_hist[["history"]]) %>%
         mutate(method = "multiplicative")
 
     retv <- bind_rows(df1, df2) %>%
@@ -111,14 +113,14 @@ test_a_bunch(Y_t, L_0, R_0, niter = 10000L) %>%
             " dimensions."))
 ```
 
-```
-## Error in history <<- rep(NA_real_, niter): cannot change value of locked binding for 'history'
-```
+<div class="figure">
+<img src="tools/figure/basic_simulations-1.png" alt="plot of chunk basic_simulations" width="600px" height="500px" />
+<p class="caption">plot of chunk basic_simulations</p>
+</div>
 
 
 ## See also
 
-* The original paper, by Lee, Daniel D. and Seung, H. Sebastian.
-	[Algorithms for Non-negative Matrix Factorization](http://papers.nips.cc/paper/1861-algorithms-for-non-negative-matrix-factorization.pdf), 2001.
+* Lee, Daniel D. and Seung, H. Sebastian. [Algorithms for Non-negative Matrix Factorization](http://papers.nips.cc/paper/1861-algorithms-for-non-negative-matrix-factorization.pdf), 2001.
 * Pav, Steven E. [System and method for unmixing spectroscopic observations with nonnegative matrix factorization](https://patentscope.wipo.int/search/en/detail.jsf?docId=US42758160), 2012.
 
