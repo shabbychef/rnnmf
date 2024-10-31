@@ -31,6 +31,23 @@ if (require(drat)) {
 }
 ```
 
+# What is it?
+
+Non-negative matrix factorization is a tool for decomposing a non-negative
+matrix $Y$ approximately as $Y \approx L R$ for non-negative matrices $L, R$ of
+pre-specified rank.
+This package provides code for non-negative matrix factorization with penalty
+terms for the $\ell_1$ and $\ell_2$ norms of the two factors, as well as
+for non-orthogonality of the factors.
+The code is based on the conceptually simple multiplicative update of 
+[Lee & Seung](http://papers.nips.cc/paper/2861-algorithms-for-non-negative-matrix-factorization.pdf).
+An additive update based on the same ideas is also given.
+
+This code is provided mostly for research purposes, and no warranty is given
+regarding speed, or convergence.
+
+
+
 # Basic Usage
 
 We demonstrate the usage of the multiplicative and additive updates in
@@ -94,10 +111,9 @@ test_a_bunch(Y_t, L_0, R_0, niter = 10000L) %>%
             " dimensions."))
 ```
 
-<div class="figure">
-<img src="tools/figure/basic_simulations-1.png" alt="plot of chunk basic_simulations" width="600px" height="500px" />
-<p class="caption">plot of chunk basic_simulations</p>
-</div>
+```
+## Error in history <<- rep(NA_real_, niter): cannot change value of locked binding for 'history'
+```
 
 
 ## See also

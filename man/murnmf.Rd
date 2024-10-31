@@ -103,7 +103,7 @@ all risk.
  nc <- 20
  dm <- 4
 
- randmat <- function(nr,nc) { matrix(runif(nr*nc),nrow=nr) }
+ randmat <- function(nr,nc,...) { matrix(pmax(0,runif(nr*nc,...)),nrow=nr) }
  set.seed(1234)
  real_L <- randmat(nr,dm)
  real_R <- randmat(dm,nc)
@@ -129,6 +129,7 @@ sum(out2$L)
  objective(Y,out3$L,out3$R)
 list(L1=sum(out1$L),R1=sum(out1$R),L3=sum(out3$L),R3=sum(out3$R))
 
+\donttest{
 # example showing how to use the on_iteration_end callback to save iterates.
 max_iterations <- 1e3L
 it_history <<- rep(NA_real_, max_iterations)
@@ -137,6 +138,18 @@ on_iteration_end <- function(iteration, Y, L, R, ...) {
   it_history[iteration] <<- quadratic_objective(Y,L,R)
 }
 out1b <- murnmf(Y, L_0, R_0, max_iterations=max_iterations, on_iteration_end=on_iteration_end)
+}
+
+# should work on sparse matrices too, but beware zeros in the initial estimates
+value
+if (require(Matrix)) { 
+ real_L <- randmat(nr,dm,min=-1)
+ real_R <- randmat(dm,nc,min=-1)
+ Y <- as(real_L \%*\% real_R, "sparseMatrix")
+ L_0 <- randmat(nr,dm)
+ R_0 <- randmat(dm,nc)
+ out1 <- murnmf(Y, L_0, R_0, max_iterations=1e2L,check_optimal_step=TRUE)
+}
 
 }
 \references{

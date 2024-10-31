@@ -157,11 +157,44 @@ opts_chunk$set(fig.width=resol,
                out.height=sprintf('%.3f\\textwidth',0.975/aspr),
                dpi=450)
 
+# a more compact figure use
+# fig.width=cfg_width,fig.height=cfg_height,out.width=cot_width,out.height=cot_height,
+cfg_width <- resol
+cfg_height <- resol / 2
+cot_width <- "0.975\\textwidth"
+cot_height <- "0.4875\\textwidth"
 
+
+# for cup plots.
+# fig.width=cpg_width,fig.height=cpg_height,out.width=cpt_width,out.height=cpt_height,
+cpg_width <- 1.5 * resol
+cpg_height <- 1.5* resol / 1.75
+cpt_width <- "0.975\\textwidth"
+cpt_height <- paste0(signif(0.975 * cpg_height / cpg_width,4),"\\textwidth")
+
+# for tall cup plots.
+# fig.width=tcg_width,fig.height=tcg_height,out.width=tct_width,out.height=tct_height,
+tcg_width <- 1.5 * resol
+tcg_height <- 1.5* resol * 1.4
+tct_width <- "0.975\\textwidth"
+tct_height <- paste0(signif(0.975 * tcg_height / tcg_width,4),"\\textwidth")
+
+
+# a wide figure use
+# fig.width=wfg_width,fig.height=wfg_height,out.width=wot_width,out.height=wot_height,
+wfg_width <- 1.2 * resol
+wfg_height <- 0.6 * resol
+wot_width <- "0.99\\textwidth"
+wot_height <- "0.495\\textwidth"
+
+# a tall figure use
+# fig.width=tfg_width,fig.height=wfg_height,out.width=tot_width,out.height=tot_height,
+tfg_width <- resol
+tfg_height <- aspr * resol
+tot_width <- "0.99\\textwidth"
+tot_height <- paste0(round(0.99 * aspr,3),"\\textwidth")
 
 opts_chunk$set(fig.pos='h')
-
-
 # doing this means that png files are made of figures;
 # the savings is small, and it looks like shit:
 #opts_chunk$set(fig.path="figure/",dev=c("png","pdf","cairo_ps"))
@@ -172,7 +205,8 @@ opts_chunk$set(fig.pos='h')
 # this would be for figures:
 #opts_chunk$set(out.width='.8\\textwidth')
 # for text wrapping:
-options(width=64,digits=2)
+# CRAN complains if you do this:
+# options(width=64,digits=2)
 opts_chunk$set(size="small")
 opts_chunk$set(tidy=TRUE,tidy.opts=list(width.cutoff=50,keep.blank.line=TRUE))
 @
@@ -224,8 +258,8 @@ opts_chunk$set(tidy=TRUE,tidy.opts=list(width.cutoff=50,keep.blank.line=TRUE))
 
 \title{An Iterative Algorithm for Regularized Non-negative Matrix Factorizations}
 %\author{Steven E. Pav \thanks{\email{spav@alumni.cmu.edu}}}
-\author{Steven E. Pav \thanks{\email{steven@gilgamath.com}
-Application of the methods described herein may be covered by U.S. Patent.  \cite{pav_nmf}
+\author{Steven E. Pav \thanks{\email{shabbychef@gmail.com}
+Application of the multiplicative methods described herein for chemometrics applications may be covered by U.S. Patent.  \cite{pav_nmf}
 }}
 %\date{\today, \currenttime}
 
@@ -237,6 +271,11 @@ Application of the methods described herein may be covered by U.S. Patent.  \cit
 We generalize the non-negative matrix factorization algorithm of
 \citeauthor{LeeSeung} \cite{LeeSeung} to accept
 a weighted norm, and to support ridge and Lasso regularization.
+We recast the \citeauthor{LeeSeung} multiplicative update
+as an additive update which does not get stuck on zero values.
+%We apply the companion R package \textsc{rnnmf} \cite{rnnmfrnnmf-Manual}
+%to the problem of finding a reduced rank representation of a database
+%of cocktails.
 \end{abstract}%UNFOLD
 
 \nocite{LeeSeung,GonzalezZhang,pav_nmf,2024survey}
@@ -305,6 +344,7 @@ an all-purpose constrained quadratic optimization solver, or other complicated s
 %\nocite{nocedal2006numerical}
 %UNFOLD
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Regularized Non-Negative Matrix Factorization}%FOLDUP
 
 We generalize the optimization problem of \ref{eqn:nmf_def_classic} to include
@@ -745,6 +785,7 @@ general form of the problem is an obvious modification of the update steps.
 
 %UNFOLD
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Additive Steps and Convergence}%FOLDUP
 \theoremref{lee_seung} only tells us that the sequence \objf{\xmp[k]} is non-decreasing.
 It does \emph{not} guarantee convergence to a global, or even a local, minimum.
@@ -1033,10 +1074,12 @@ the $\LMp[k]$ and $\RMp[k]$.
 %\end{algorithm}
 %UNFOLD
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Simulations}%FOLDUP
 
 
 <<'mc_sims',eval=TRUE>>=
+# ok.
 library(dplyr)
 library(rnnmf)
 
@@ -1049,24 +1092,25 @@ runifmat <- function(nr,nc,...) {
 }
 
 test_a_bunch <- function(Y_t, L_0, R_0, niter=1e4L) {
-	iter_history <<- rep(NA_real_, niter)
+	iter_hist <- new.env()
+	iter_hist[['history']] <- rep(NA_real_, niter)
 	on_iteration_end <- function(iteration, Y, L, R, ...) {
-		iter_history[iteration] <<- frobenius_err(Y,L,R)
+		iter_hist[['history']][iteration] <<- frobenius_err(Y,L,R)
 	}
-	wuz <- aurnmf(Y_t, L_0, R_0, max_iterations=length(iter_history), on_iteration_end=on_iteration_end)
-	df1 <- tibble(x=seq_along(iter_history),y=iter_history) %>% mutate(method='additive, optimal step')
+	wuz <- aurnmf(Y_t, L_0, R_0, max_iterations=niter, on_iteration_end=on_iteration_end)
+	df1 <- tibble(x=seq_along(iter_hist[['history']]),y=iter_hist[['history']]) %>% mutate(method='additive, optimal step')
 
-	#iter_history <<- rep(NA_real_, niter)
-	#wuz <- aurnmf(Y_t, L_0, R_0, max_iterations=length(iter_history), check_optimal_step=FALSE, on_iteration_end=on_iteration_end)
-	#df15 <- tibble(x=seq_along(iter_history),y=iter_history) %>% mutate(method='additive, naive step')
+	#iter_hist[['history']] <- rep(NA_real_, niter)
+	#wuz <- aurnmf(Y_t, L_0, R_0, max_iterations=niter, check_optimal_step=FALSE, on_iteration_end=on_iteration_end)
+	#df15 <- tibble(x=seq_along(iter_hist[['history']]),y=iter_hist[['history']]) %>% mutate(method='additive, naive step')
 
-	#iter_history <<- rep(NA_real_, niter)
-	#wuz <- aurnmf(Y_t, L_0, R_0, max_iterations=length(iter_history), check_optimal_step=FALSE, tau=0.9, on_iteration_end=on_iteration_end)
-	#df17 <- tibble(x=seq_along(iter_history),y=iter_history) %>% mutate(method='additive, naive step, tau=0.9')
+	#iter_hist[['history']] <- rep(NA_real_, niter)
+	#wuz <- aurnmf(Y_t, L_0, R_0, max_iterations=niter, check_optimal_step=FALSE, tau=0.9, on_iteration_end=on_iteration_end)
+	#df17 <- tibble(x=seq_along(iter_hist[['history']]),y=iter_hist[['history']]) %>% mutate(method='additive, naive step, tau=0.9')
 
-	iter_history <<- rep(NA_real_, niter)
-	wuz <- murnmf(Y_t, L_0, R_0, max_iterations=length(iter_history), on_iteration_end=on_iteration_end)
-	df2 <- tibble(x=seq_along(iter_history),y=iter_history) %>% mutate(method='multiplicative')
+	iter_hist[['history']] <- rep(NA_real_, niter)
+	wuz <- murnmf(Y_t, L_0, R_0, max_iterations=niter, on_iteration_end=on_iteration_end)
+	df2 <- tibble(x=seq_along(iter_hist[['history']]),y=iter_hist[['history']]) %>% mutate(method='multiplicative')
 
 	#retv <- bind_rows(df1,df15,df17,df2) %>%
 	retv <- bind_rows(df1,df2) %>%

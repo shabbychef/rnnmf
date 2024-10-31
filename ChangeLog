@@ -1,5 +1,5 @@
 
-2024-10-24 Steven E. Pav <shabbychef@gmail.com>
+2024-10-30 Steven E. Pav <shabbychef@gmail.com>
 * renaming rnnmf because rNMF was taken on CRAN.
 * version 0.3.0 to CRAN.
 

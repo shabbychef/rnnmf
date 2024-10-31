@@ -142,7 +142,7 @@ all risk.
  nc <- 5
  dm <- 2
  
- randmat <- function(nr,nc) { matrix(runif(nr*nc),nrow=nr) }
+ randmat <- function(nr,nc,...) { matrix(pmax(0,runif(nr*nc,...)),nrow=nr) }
  set.seed(1234)
  real_L <- randmat(nr,dm+2)
  real_R <- randmat(ncol(real_L),nc)
@@ -177,6 +177,7 @@ all risk.
          max_iterations=1e4L,check_optimal_step=FALSE)
  wt_objective(Y,out3$L,out3$R,W_0R,W_0C)
 
+\donttest{
 # example showing how to use the on_iteration_end callback to save iterates.
  max_iterations <- 1e3L
  it_history <<- rep(NA_real_, max_iterations)
@@ -185,6 +186,17 @@ all risk.
  }
  out1b <- gaurnmf(Y, L_0, R_0, W_0R=W_0R, W_0C=W_0C, 
    max_iterations=max_iterations, on_iteration_end=on_iteration_end, check_optimal_step=FALSE)
+}
+
+# should work on sparse matrices too.
+if (require(Matrix)) { 
+ real_L <- randmat(nr,dm,min=-1)
+ real_R <- randmat(dm,nc,min=-1)
+ Y <- as(real_L \%*\% real_R, "sparseMatrix")
+ L_0 <- as(randmat(nr,dm,min=-0.5), "sparseMatrix")
+ R_0 <- as(randmat(dm,nc,min=-0.5), "sparseMatrix")
+ out1 <- gaurnmf(Y, L_0, R_0, max_iterations=1e2L,check_optimal_step=TRUE)
+}
 
 }
 \references{

@@ -9,10 +9,11 @@ News for package \sQuote{rnnmf}
 \newcommand{\CRANpkg}{\href{https://cran.r-project.org/package=#1}{\pkg{#1}}}
 \newcommand{\rnnmf}{\CRANpkg{rnnmf}}
 }
-\section{\rnnmf{} Initial Version 0.3.0 (2024-10-24) }{
+\section{\rnnmf{} Initial Version 0.3.0 (2024-10-30) }{
 
 \itemize{
 \item first CRAN release.
+\item changed name from rnmf to rnnmf.
 }
 }
 

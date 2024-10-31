@@ -72,12 +72,13 @@ pick_direction <- function(X_k, gradfX_k, F) {
 
 # like matrix multiplication, but if X or Y is not given or is null, treat as the identity.
 # if one of them is a scalar, treat them as the identity times that scalar.
+# 2FIX: do we want to allow a vector to stand for a diagonal matrix?
 `%**%` <- function(X, Y) {
 	if (missing(X) || is.null(X)) {
 		return(Y)
 	} else if (missing(Y) || is.null(Y)) {
 		return(X)
-	} else if (!is.matrix(X) || !is.matrix(Y)) {
+	} else if (is.null(dim(X)) || is.null(dim(Y))) {
 		return(X * Y)
 	}
 	return(X %*% Y)
@@ -95,6 +96,22 @@ times_orth <- function(M) {
 	# alternatively: M %*% (1 - diag(ncol(M)))
 	matrix(rep(rowSums(M),ncol(M)),ncol=ncol(M),byrow=FALSE) - M
 }
+
+fix_LR_names <- function(L, R) {
+	if (is.null(colnames(L)) & is.null(rownames(R))) {
+		new_names <- paste0('factor',seq_len(ncol(L)))
+		colnames(L) <- new_names
+		rownames(R) <- new_names
+	}
+	if (is.null(colnames(L))) {
+		colnames(L) <- rownames(R)
+	}
+	if (is.null(rownames(L))) {
+		rownames(R) <- colnames(L)
+	}
+	return(list(L=L,R=R))
+}
+
 
 #' @title nmf .
 #'
@@ -173,7 +190,7 @@ times_orth <- function(M) {
 #'  nc <- 20
 #'  dm <- 4
 #' 
-#'  randmat <- function(nr,nc) { matrix(runif(nr*nc),nrow=nr) }
+#'  randmat <- function(nr,nc,...) { matrix(pmax(0,runif(nr*nc,...)),nrow=nr) }
 #'  set.seed(1234)
 #'  real_L <- randmat(nr,dm)
 #'  real_R <- randmat(dm,nc)
@@ -200,6 +217,7 @@ times_orth <- function(M) {
 #'  objective(Y,out3$L,out3$R)
 #' list(L1=sum(out1$L),R1=sum(out1$R),L3=sum(out3$L),R3=sum(out3$R))
 #'
+#' \donttest{
 #' # example showing how to use the on_iteration_end callback to save iterates.
 #' max_iterations <- 5e3L
 #' it_history <<- rep(NA_real_, max_iterations)
@@ -208,7 +226,19 @@ times_orth <- function(M) {
 #'   it_history[iteration] <<- quadratic_objective(Y,L,R)
 #' }
 #' out1b <- aurnmf(Y, L_0, R_0, max_iterations=max_iterations, on_iteration_end=on_iteration_end)
+#' }
 #'
+#' # should work on sparse matrices too.
+#' if (require(Matrix)) { 
+#'  real_L <- randmat(nr,dm,min=-1)
+#'  real_R <- randmat(dm,nc,min=-1)
+#'  Y <- as(real_L %*% real_R, "sparseMatrix")
+#'  L_0 <- as(randmat(nr,dm,min=-0.5), "sparseMatrix")
+#'  R_0 <- as(randmat(dm,nc,min=-0.5), "sparseMatrix")
+#'  out1 <- aurnmf(Y, L_0, R_0, max_iterations=1e2L,check_optimal_step=TRUE)
+#' }
+#'
+#' @importFrom Matrix t rowSums
 #' @author Steven E. Pav \email{shabbychef@@gmail.com}
 #' @export
 aurnmf <- function(Y, L, R, 
@@ -237,6 +267,10 @@ aurnmf <- function(Y, L, R,
 	stopifnot(gamma_2R >= 0)
 	stopifnot((0 < tau) && (tau < 1))
 	stopifnot((0 <= annealing_rate) && (annealing_rate < 1))
+
+	fixd <- fix_LR_names(L, R)
+	L <- fixd$L
+	R <- fixd$R
 
 	# precompute
 	W_0R_Y <- (W_0R %**% Y)
