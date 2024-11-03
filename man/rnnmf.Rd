@@ -31,7 +31,7 @@ Factorization." Advances in Neural Information Processing Systems 13 (2001):
 \url{http://papers.nips.cc/paper/1861-algorithms-for-non-negative-matrix-factorization.pdf}
 
 Pav, S. E. "An Iterative Algorithm for Regularized Non-negative Matrix Factorizations."
-Forthcoming. (2024)
+Arxiv pre-print (2024).  \doi{10.48550/arXiv.2410.22698}
 
 Pav, Steven E. "System and method for unmixing spectroscopic observations with nonnegative 
 matrix factorization." US Patent 8140272, 2012.

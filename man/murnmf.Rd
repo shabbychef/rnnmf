@@ -157,7 +157,7 @@ Nonnegative Least Squares Problems." Journal of Optimization Theory and Applicat
 no 1 (2005): 191--202. \url{https://scholarship.rice.edu/bitstream/handle/1911/102020/TR04-08.pdf}
 
 Pav, S. E. "An Iterative Algorithm for Regularized Non-negative Matrix Factorizations."
-Forthcoming. (2024)
+Arxiv pre-print (2024).  \doi{10.48550/arXiv.2410.22698}
 
 Lee, Daniel D. and Seung, H. Sebastian. "Algorithms for Non-negative Matrix 
 Factorization." Advances in Neural Information Processing Systems 13 (2001):
